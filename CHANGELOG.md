@@ -1,13 +1,16 @@
-## [project-title] Changelog
+## Azure Media Services v3 Python Samples Changelog
 
-<a name="x.y.z"></a>
-# x.y.z (yyyy-mm-dd)
+<a name="2021-02-26"></a>
+# 2021-02-26
 
 *Features*
-* ...
+
+* BasicEncoder sample
 
 *Bug Fixes*
-* ...
+
+* None
 
 *Breaking Changes*
-* ...
+
+* None

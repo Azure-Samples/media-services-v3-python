@@ -1,57 +1,33 @@
-# Project Name
+# Azure Media Services v3 Python Samples
 
-(short, 1-3 sentenced, description of the project)
+Use this set of samples to get started with Azure Media Service v3 and Python.
+
+**NOTE**
+Owned and maintained by Microsoft. Please do not push changes directly to this repo.  Please fork the repo and set it as upstream and your own fork as origin. See the CONTRIBUTING.md file for more details.
 
 ## Features
 
 This project framework provides the following features:
 
-* Feature 1
-* Feature 2
-* ...
+* BasicEncoding
 
 ## Getting Started
 
 ### Prerequisites
 
-(ideally very short, if any)
-
-- OS
-- Library version
-- ...
+* Install Python 3.x
+* Install the Python SDK for [Azure Media Services](https://docs.microsoft.com/en-us/python/api/overview/azure/media-services?view=azure-python)
 
 ### Installation
 
-(ideally very short)
+Install the modules required by the scripts as shown in the *import* section of the samples. For example:
 
-- npm install [package name]
-- mvn install
-- ...
+pip install adal
 
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [respository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
+This module is needed for Azure Active Directory authentication.
 
 ## Resources
 
-(Any additional resources or related projects)
+See the Azure Media Services [management API](https://docs.microsoft.com/en-us/python/api/overview/azure/mediaservices/management?view=azure-python).
 
-- Link to supporting information
-- Link to similar sample
-- ...
+Learn more about [Azure Media Services v3](https://docs.microsoft.com/en-us/azure/media-services/latest/media-services-overview).
