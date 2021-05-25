@@ -10,7 +10,7 @@ Owned and maintained by Microsoft. Please do not push changes directly to this r
 This project framework provides the following features:
 
 * **BasicEncoding**
-* **FaceRedactorEventBased**: This is an example of an event-based approach that triggers an Azure Media Services Face Redactor job on a video as soon as it lands on an Azure Storage Account. It leverages Azure Media Services, Azure Function, Event Grid and Azure Storage for the solution. For the full description of the solution, see the [README.md](https://github.com/Azure-Samples/media-services-v3-python/main/blob/VideoAnalytics/FaceRedactorEventBased/README.md).
+* **FaceRedactorEventBased**: This is an example of an event-based approach that triggers an Azure Media Services Face Redactor job on a video as soon as it lands on an Azure Storage Account. It leverages Azure Media Services, Azure Function, Event Grid and Azure Storage for the solution. For the full description of the solution, see the [README.md](https://github.com/Azure-Samples/media-services-v3-python/blob/main/VideoAnalytics/FaceRedactorEventBased/README.md).
 
 ## Getting Started
 
