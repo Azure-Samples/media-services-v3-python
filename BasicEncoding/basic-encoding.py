@@ -50,12 +50,12 @@ default_credential = DefaultAzureCredential()
 source_file = "ignite.mp4"
 
 # Generate a random number that will be added to the naming of things so that you don't have to keep doing this during testing.
-thisRandom = random.randint(0,9999)
+uniqueness = random.randint(0,9999)
 
 # Set the attributes of the input Asset using the random number
-in_asset_name = 'inputassetName' + str(thisRandom)
-in_alternate_id = 'inputALTid' + str(thisRandom)
-in_description = 'inputdescription' + str(thisRandom)
+in_asset_name = 'inputassetName' + str(uniqueness)
+in_alternate_id = 'inputALTid' + str(uniqueness)
+in_description = 'inputdescription' + str(uniqueness)
 # Create an Asset object
 # From the SDK
 # Asset(*, alternate_id: str = None, description: str = None, container: str = None, storage_account_name: str = None, **kwargs) -> None
@@ -63,9 +63,9 @@ in_description = 'inputdescription' + str(thisRandom)
 input_asset = Asset(alternate_id=in_alternate_id,description=in_description)
 
 # Set the attributes of the output Asset using the random number
-out_asset_name = 'outputassetName' + str(thisRandom)
-out_alternate_id = 'outputALTid' + str(thisRandom)
-out_description = 'outputdescription' + str(thisRandom)
+out_asset_name = 'outputassetName' + str(uniqueness)
+out_alternate_id = 'outputALTid' + str(uniqueness)
+out_description = 'outputdescription' + str(uniqueness)
 # From the SDK
 # Asset(*, alternate_id: str = None, description: str = None, container: str = None, storage_account_name: str = None, **kwargs) -> None
 output_asset = Asset(alternate_id=out_alternate_id,description=out_description)
@@ -108,7 +108,7 @@ with open(source_file, "rb") as data:
     blob_client.upload_blob(data, blob_type="BlockBlob")
 
 ### Create a Transform ###
-transform_name='MyTrans' + str(thisRandom)
+transform_name='MyTrans' + str(uniqueness)
 # From SDK
 # TransformOutput(*, preset, on_error=None, relative_priority=None, **kwargs) -> None
 transform_output = TransformOutput(preset=BuiltInStandardEncoderPreset(preset_name="AdaptiveStreaming"))
@@ -118,7 +118,7 @@ print("Creating transform " + transform_name)
 transform = client.transforms.create_or_update(resource_group_name=resource_group_name,account_name=account_name,transform_name=transform_name,outputs=[transform_output])
 
 ### Create a Job ###
-job_name = 'MyJob'+ str(thisRandom)
+job_name = 'MyJob'+ str(uniqueness)
 print("Creating job " + job_name)
 files = (source_file)
 # From SDK
