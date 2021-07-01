@@ -36,9 +36,9 @@ def main(event: func.EventGridEvent):
     ams_account_name = os.getenv('ACCOUNTNAME')
     resource_group_name = os.getenv('RESOURCEGROUP')
     subscription_id = os.getenv('SUBSCRIPTIONID')
-    client_id = os.getenv('AZURE_CLIENT_ID')
-    client_secret = os.getenv('AZURE_CLIENT_SECRET')
-    TENANT_ID = os.getenv('AZURE_TENANT_ID')
+    client_id = os.getenv('AADCLIENTID')
+    client_secret = os.getenv('AADSECRET')
+    TENANT_ID = os.getenv('AADTENANTID')
     storage_blob_url = 'https://' + storage_account_name + '.blob.core.windows.net/'
     transform_name = 'faceredact'
     LOGIN_ENDPOINT = AZURE_PUBLIC_CLOUD.endpoints.active_directory
