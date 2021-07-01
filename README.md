@@ -24,8 +24,21 @@ Owned and maintained by Microsoft. Please do not push changes directly to this r
 
 The Pypi page for the Media Services Python SDK with latest version details is located at - [azure-mgmt-media](https://pypi.org/project/azure-mgmt-media/)
 
+
 ``` bash
 pip install azure-mgmt-media
+```
+
+* Install the [Azure Storage SDK for Python](https://pypi.org/project/azure-storage-blob/)
+
+``` bash
+pip install azure-storage-blob
+```
+
+* You can also install all of the requirements for the samples by using the "requirements.txt" file
+
+``` bash
+pip install -r requirements.txt
 ```
 
 You can also use pip to uninstall libraries and install specific versions, including preview versions. For more information, see [How to install Azure library packages for Python](https://docs.microsoft.com/azure/developer/python/azure-sdk-install).
@@ -33,7 +46,11 @@ You can also use pip to uninstall libraries and install specific versions, inclu
 
 ## Create the .env file
 
-Copy the contents from the sample.env file that is in your forked repo in the sample folder. Then, create your own .env file by clicking on Add file -> Create new file. Name the file *.env* and fill in the variables. When you're done, click on 'Commit new file'. We are now ready to deploy the solution, but we will first examine the code files that we will be using.
+Copy the contents from the sample.env file that is in your forked repo in the root folder. Then, create your own .env file by clicking on Add file -> Create new file. Name the file *.env* and fill in the variables.
+
+Do not allow this .env file to be checked into your fork of the Git hub repository! This is disallowed in the .gitignore file, but be extra careful not to allow the credentials to leak into your source control for this file.
+
+All samples will load the root ".env" file first, and some of the samples add additional .env variables needed for the samples to work inside each sample folder. Make sure to check each sample for additional environment settings that are required.
 
 
 ### Installation
