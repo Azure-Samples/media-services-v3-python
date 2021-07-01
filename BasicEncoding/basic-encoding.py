@@ -1,6 +1,4 @@
-import adal
-from msrestazure.azure_active_directory import AdalAuthentication
-from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
+from azure.identity import DefaultAzureCredential
 from azure.mgmt.media import AzureMediaServices
 from azure.mgmt.media.models import (
   Asset,
@@ -45,17 +43,7 @@ storage_account_key = os.getenv('STORAGEACCOUNTKEY','default_val')
 storage_blob_url = 'https://' + storage_account_name + '.blob.core.windows.net/'
 
 # Active Directory
-LOGIN_ENDPOINT = AZURE_PUBLIC_CLOUD.endpoints.active_directory
-RESOURCE = AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id
-
-# Establish credentials
-context = adal.AuthenticationContext(LOGIN_ENDPOINT + '/' + tenant_id)
-credentials = AdalAuthentication(
-    context.acquire_token_with_client_credentials,
-    RESOURCE,
-    client_id,
-    key
-)
+default_credential = DefaultAzureCredential()
 
 # The file you want to upload.  For this example, put the file in the same folder as this script. 
 # The file ignite.mp4 has been provided for you. 
@@ -86,7 +74,7 @@ output_asset = Asset(alternate_id=out_alternate_id,description=out_description)
 print("Creating AMS client")
 # From SDK
 # AzureMediaServices(credentials, subscription_id, base_url=None)
-client = AzureMediaServices(credentials, subscription_id)
+client = AzureMediaServices(default_credential, subscription_id)
 
 # Create an input Asset
 print("Creating input asset " + in_asset_name)
@@ -107,9 +95,9 @@ outputAsset = client.assets.create_or_update(resource_group_name, account_name, 
 
 ### Use the Storage SDK to upload the video ###
 print("Uploading the file " + source_file)
-# From SDK
-# BlobServiceClient(account_url, credential=None, **kwargs)
-blob_service_client = BlobServiceClient(account_url=storage_blob_url, credential=storage_account_key)
+
+blob_service_client = BlobServiceClient(account_url=storage_blob_url, credential=default_credential)
+
 # From SDK
 # get_blob_client(container, blob, snapshot=None)
 blob_client = blob_service_client.get_blob_client(in_container,source_file)

@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+#Environment files
+.env
+
 # User-specific files
 *.rsuser
 *.suo
@@ -351,3 +354,4 @@ MigrationBackup/
 
 #Environment files
 .env
+BasicEncoding/.env

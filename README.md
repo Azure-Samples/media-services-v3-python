@@ -16,25 +16,42 @@ Owned and maintained by Microsoft. Please do not push changes directly to this r
 
 ### Prerequisites
 
+- If you don't have an Azure subscription, create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin.
+- Create a resource group to use with these samples.
+
 * Install Python 3.x
 * Install the Python SDK for [Azure Media Services](https://docs.microsoft.com/python/api/overview/azure/media-services?view=azure-python)
+
+The Pypi page for the Media Services Python SDK with latest version details is located at - [azure-mgmt-media](https://pypi.org/project/azure-mgmt-media/)
 
 ``` bash
 pip install azure-mgmt-media
 ```
+
+You can also use pip to uninstall libraries and install specific versions, including preview versions. For more information, see [How to install Azure library packages for Python](https://docs.microsoft.com/azure/developer/python/azure-sdk-install).
+
+
+## Create the .env file
+
+Copy the contents from the sample.env file that is in your forked repo in the sample folder. Then, create your own .env file by clicking on Add file -> Create new file. Name the file *.env* and fill in the variables. When you're done, click on 'Commit new file'. We are now ready to deploy the solution, but we will first examine the code files that we will be using.
+
 
 ### Installation
 
 Install the modules required by the scripts as shown in the *import* section of the samples. For example:
 
 ``` bash
-pip install adal
+pip install azure-identity
 ```
 
-This module is needed for Azure Active Directory authentication.
+This module is needed for Azure Active Directory authentication. See the details at [Azure Identity client library for Python](https://docs.microsoft.com//python/api/overview/azure/identity-readme?view=azure-python#environment-variables)
 
 ## Resources
 
-See the Azure Media Services [management API](https://docs.microsoft.com/python/api/overview/azure/mediaservices/management?view=azure-python).
-
-Learn more about [Azure Media Services v3](https://docs.microsoft.com/azure/media-services/latest/media-services-overview).
+- See the Azure Media Services [management API](https://docs.microsoft.com/python/api/overview/azure/mediaservices/management?view=azure-python).
+- Learn how to use the [Storage APIs with Python](https://docs.microsoft.com/azure/developer/python/azure-sdk-example-storage-use?tabs=cmd)
+- Learn more about the [Azure Identity client library for Python](https://docs.microsoft.com//python/api/overview/azure/identity-readme?view=azure-python#environment-variables)
+- Learn more about [Azure Media Services v3](https://docs.microsoft.com/azure/media-services/latest/media-services-overview).
+- Learn about the [Azure Python SDKs](https://docs.microsoft.com/azure/developer/python)
+- Learn more about [usage patterns for Azure Python SDKs](https://docs.microsoft.com/azure/developer/python/azure-sdk-library-usage-patterns)
+- Find more Azure Python SDKs in the [Azure Python SDK index](https://docs.microsoft.com/azure/developer/python/azure-sdk-library-package-index)
