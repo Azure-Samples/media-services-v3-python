@@ -6,6 +6,9 @@
 #Environment files
 .env
 
+#Python Virtual Environment
+.venv/
+
 # User-specific files
 *.rsuser
 *.suo

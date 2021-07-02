@@ -18,10 +18,40 @@ Owned and maintained by Microsoft. Please do not push changes directly to this r
 
 - If you don't have an Azure subscription, create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin.
 - Create a resource group to use with these samples.
+- Install Python 3.x
 
-* Install Python 3.x
-* Set up and [configure your local Python dev environment for Azure](https://docs.microsoft.com/en-us/azure/developer/python/configure-local-development-environment)
-* Install the Python SDK for [Azure Media Services](https://docs.microsoft.com/python/api/overview/azure/media-services?view=azure-python)
+#### Use Python virtual environments
+For every sample, we recommend that you always create and activate a virtual environment using the following steps:
+
+1. Open the sample folder in VSCode or other editor
+1. Create the virtual environment
+
+``` bash
+# py -3 uses the global python interpreter. You can also use python -m venv .venv.
+py -3 -m venv .venv
+```
+
+This command runs the Python venv module and creates a virtual environment in a folder named .venv.
+
+1. Activate the virtual environment:
+
+``` bash
+.venv\scripts\activate
+```
+
+A virtual environment is a folder within a project that isolates a copy of a specific Python interpreter. Once you activate that environment (which Visual Studio Code does automatically), running pip install installs a library into that environment only. When you then run your Python code, it runs in the environment's exact context with specific versions of every library. And when you run pip freeze, you get the exact list of the those libraries. (In many of the samples, you create a requirements.txt file for the libraries you need, then use pip install -r requirements.txt. A requirements file is generally needed when you deploy code to Azure.)
+
+### Installation
+
+Set up and [configure your local Python dev environment for Azure](https://docs.microsoft.com/en-us/azure/developer/python/configure-local-development-environment)
+
+1. Install the azure-identity library for Python. This module is needed for Azure Active Directory authentication. See the details at [Azure Identity client library for Python](https://docs.microsoft.com//python/api/overview/azure/identity-readme?view=azure-python#environment-variables)
+
+``` bash
+pip install azure-identity
+```
+
+1. Install the Python SDK for [Azure Media Services](https://docs.microsoft.com/python/api/overview/azure/media-services?view=azure-python)
 
 The Pypi page for the Media Services Python SDK with latest version details is located at - [azure-mgmt-media](https://pypi.org/project/azure-mgmt-media/)
 
@@ -30,20 +60,19 @@ The Pypi page for the Media Services Python SDK with latest version details is l
 pip install azure-mgmt-media
 ```
 
-* Install the [Azure Storage SDK for Python](https://pypi.org/project/azure-storage-blob/)
+1. Install the [Azure Storage SDK for Python](https://pypi.org/project/azure-storage-blob/)
 
 ``` bash
 pip install azure-storage-blob
 ```
 
-* You can also install all of the requirements for the samples by using the "requirements.txt" file
+1. You can optionally install ALL of the requirements for a given samples by using the "requirements.txt" file in the samples folder
 
 ``` bash
 pip install -r requirements.txt
 ```
 
 You can also use pip to uninstall libraries and install specific versions, including preview versions. For more information, see [How to install Azure library packages for Python](https://docs.microsoft.com/azure/developer/python/azure-sdk-install).
-
 
 ## Create the .env file
 
@@ -53,16 +82,6 @@ Do not allow this .env file to be checked into your fork of the Git hub reposito
 
 All samples will load the root ".env" file first, and some of the samples add additional .env variables needed for the samples to work inside each sample folder. Make sure to check each sample for additional environment settings that are required.
 
-
-### Installation
-
-Install the modules required by the scripts as shown in the *import* section of the samples. For example:
-
-``` bash
-pip install azure-identity
-```
-
-This module is needed for Azure Active Directory authentication. See the details at [Azure Identity client library for Python](https://docs.microsoft.com//python/api/overview/azure/identity-readme?view=azure-python#environment-variables)
 
 ## Resources
 
