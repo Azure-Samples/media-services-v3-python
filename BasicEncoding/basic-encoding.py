@@ -38,9 +38,7 @@ arm_endpoint = os.getenv('ARMENDPOINT','default_val')
 # Values from .env and the blob url
 # For this sample you will use the storage account key to create and access assets
 # The SAS URL is not used here
-storage_account_name = os.getenv('STORAGEACCOUNTNAME','default_val')
-storage_account_key = os.getenv('STORAGEACCOUNTKEY','default_val')
-storage_blob_url = 'https://' + storage_account_name + '.blob.core.windows.net/'
+storage_account_connection = os.getenv('STORAGEACCOUNTCONNECTION','default_val')
 
 # Active Directory
 default_credential = DefaultAzureCredential()
@@ -82,7 +80,7 @@ print("Creating input asset " + in_asset_name)
 # create_or_update(resource_group_name, account_name, asset_name, parameters, custom_headers=None, raw=False, **operation_config)
 inputAsset = client.assets.create_or_update(resource_group_name, account_name, in_asset_name, input_asset)
 
-# An AMS asset is a container with a specfic id that has "asset-" prepended to the GUID.
+# An AMS asset is a container with a specific id that has "asset-" prepended to the GUID.
 # So, you need to create the asset id to identify it as the container
 # where Storage is to upload the video (as a block blob)
 in_container = 'asset-' + inputAsset.asset_id
@@ -96,26 +94,41 @@ outputAsset = client.assets.create_or_update(resource_group_name, account_name, 
 ### Use the Storage SDK to upload the video ###
 print("Uploading the file " + source_file)
 
-blob_service_client = BlobServiceClient(account_url=storage_blob_url, credential=default_credential)
+blob_service_client = BlobServiceClient.from_connection_string(storage_account_connection)
 
 # From SDK
 # get_blob_client(container, blob, snapshot=None)
 blob_client = blob_service_client.get_blob_client(in_container,source_file)
+working_dir = os.getcwd()
+print("Current working directory:" + working_dir)
+upload_file_path = os.path.join(working_dir, source_file)
+
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
+# Adjust the path as needed depending on how you are launching this python sample file. 
+
 # Upload the video to storage as a block blob
-with open(source_file, "rb") as data:
+with open(upload_file_path, "rb") as data:
   # From SDK
   # upload_blob(data, blob_type=<BlobType.BlockBlob: 'BlockBlob'>, length=None, metadata=None, **kwargs)
-    blob_client.upload_blob(data, blob_type="BlockBlob")
+    blob_client.upload_blob(data)
 
 ### Create a Transform ###
 transform_name='MyTrans' + str(uniqueness)
 # From SDK
 # TransformOutput(*, preset, on_error=None, relative_priority=None, **kwargs) -> None
 transform_output = TransformOutput(preset=BuiltInStandardEncoderPreset(preset_name="AdaptiveStreaming"))
+
+transform = Transform()
+transform.outputs = [transform_output]
+
 print("Creating transform " + transform_name)
 # From SDK
 # Create_or_update(resource_group_name, account_name, transform_name, outputs, description=None, custom_headers=None, raw=False, **operation_config)
-transform = client.transforms.create_or_update(resource_group_name=resource_group_name,account_name=account_name,transform_name=transform_name,outputs=[transform_output])
+transform = client.transforms.create_or_update(
+  resource_group_name=resource_group_name,
+  account_name=account_name,
+  transform_name=transform_name,
+  parameters = transform)
 
 ### Create a Job ###
 job_name = 'MyJob'+ str(uniqueness)

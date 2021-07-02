@@ -72,3 +72,4 @@ This module is needed for Azure Active Directory authentication. See the details
 - Learn about the [Azure Python SDKs](https://docs.microsoft.com/azure/developer/python)
 - Learn more about [usage patterns for Azure Python SDKs](https://docs.microsoft.com/azure/developer/python/azure-sdk-library-usage-patterns)
 - Find more Azure Python SDKs in the [Azure Python SDK index](https://docs.microsoft.com/azure/developer/python/azure-sdk-library-package-index)
+- [Azure Storage Blob Python SDK reference](https://docs.microsoft.com/python/api/azure-storage-blob/?view=azure-python)
