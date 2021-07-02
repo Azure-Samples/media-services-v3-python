@@ -165,13 +165,15 @@ def countdown(t):
     job_current = client.jobs.get(resource_group_name,account_name,transform_name,job_name)
     if(job_current.state == "Finished"):
       print(job_current.state)
+      # TODO: Download the output file using blob storage SDK
       return
     if(job_current.state == "Error"):
       print(job_current.state)
+      # TODO: Provide Error details from Job through API
       return
     else:
       print(job_current.state)
       countdown(int(time_in_seconds))
-      
+
 time_in_seconds = 10
 countdown(int(time_in_seconds))
