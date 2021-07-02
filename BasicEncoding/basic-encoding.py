@@ -163,13 +163,15 @@ def countdown(t):
         time.sleep(1) 
         t -= 1
     job_current = client.jobs.get(resource_group_name,account_name,transform_name,job_name)
-    if(job_current.state != "Finished"):
+    if(job_current.state == "Finished"):
       print(job_current.state)
-      countdown(int(time_in_seconds))
-    if(job_current.state != "Error"):
+      return
+    if(job_current.state == "Error"):
       print(job_current.state)
       return
     else:
       print(job_current.state)
+      countdown(int(time_in_seconds))
+      
 time_in_seconds = 10
 countdown(int(time_in_seconds))
