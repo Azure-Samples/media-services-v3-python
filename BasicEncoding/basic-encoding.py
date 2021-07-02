@@ -1,5 +1,6 @@
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.media import AzureMediaServices
+from azure.storage.blob import BlobServiceClient, BlobClient
 from azure.mgmt.media.models import (
   Asset,
   Transform,
@@ -9,8 +10,6 @@ from azure.mgmt.media.models import (
   JobInputAsset,
   JobOutputAsset)
 import os, uuid, sys
-from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient, BlobClient
 
 #Timer for checking job progress
 import time
