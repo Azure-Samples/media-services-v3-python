@@ -35,7 +35,7 @@ arm_endpoint = os.getenv('ARMENDPOINT','default_val')
 
 #### STORAGE ####
 # Values from .env and the blob url
-# For this sample you will use the storage account key to create and access assets
+# For this sample you will use the storage account connection string to create and access assets
 # The SAS URL is not used here
 storage_account_connection = os.getenv('STORAGEACCOUNTCONNECTION','default_val')
 
