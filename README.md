@@ -20,6 +20,7 @@ Owned and maintained by Microsoft. Please do not push changes directly to this r
 - Create a resource group to use with these samples.
 
 * Install Python 3.x
+* Set up and [configure your local Python dev environment for Azure](https://docs.microsoft.com/en-us/azure/developer/python/configure-local-development-environment)
 * Install the Python SDK for [Azure Media Services](https://docs.microsoft.com/python/api/overview/azure/media-services?view=azure-python)
 
 The Pypi page for the Media Services Python SDK with latest version details is located at - [azure-mgmt-media](https://pypi.org/project/azure-mgmt-media/)
