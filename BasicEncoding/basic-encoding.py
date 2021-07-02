@@ -22,24 +22,17 @@ import random
 # (Not all of the values may be used in this sample code, but the .env file is reusable.)
 # Use config to use the .env file.
 print("Getting .env values")
-client_id = os.getenv('AADCLIENTID','default_val')
-key = os.getenv('AADSECRET','default_val')
-tenant_id = os.getenv('AADTENANTID','default_val')
-tenant_domain = os.getenv('AADTENANTDOMAIN','default_val') 
-account_name = os.getenv('ACCOUNTNAME','default_val')
-location = os.getenv('LOCATION','default_val')
-resource_group_name = os.getenv('RESOURCEGROUP','default_val')
-subscription_id = os.getenv('SUBSCRIPTIONID','default_val')
-arm_audience = os.getenv('ARMAADAUDIENCE','default_val') 
-arm_endpoint = os.getenv('ARMENDPOINT','default_val') 
+default_value = "<Fill out the .env>"
+account_name = os.getenv('ACCOUNTNAME',default_value)
+resource_group_name = os.getenv('RESOURCEGROUP',default_value)
+subscription_id = os.getenv('SUBSCRIPTIONID',default_value)
 
 #### STORAGE ####
 # Values from .env and the blob url
 # For this sample you will use the storage account connection string to create and access assets
-# The SAS URL is not used here
-storage_account_connection = os.getenv('STORAGEACCOUNTCONNECTION','default_val')
+storage_account_connection = os.getenv('STORAGEACCOUNTCONNECTION',default_value)
 
-# Active Directory
+# Get the default Azure credential from the environment variables AADCLIENTID and AADSECRET
 default_credential = DefaultAzureCredential()
 
 # The file you want to upload.  For this example, put the file in the same folder as this script. 
