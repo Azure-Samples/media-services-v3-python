@@ -1,4 +1,3 @@
-import adal
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.media import AzureMediaServices
 from azure.storage.blob import BlobServiceClient, BlobClient
