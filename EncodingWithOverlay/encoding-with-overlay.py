@@ -45,8 +45,8 @@ storage_account_connection = os.getenv('STORAGEACCOUNTCONNECTION',default_value)
 default_credential = DefaultAzureCredential()
 
 # The video file & overlay logo image file(.png etc.)you want to upload.  For this example, put the file in the same folder as this script. 
-# The file ignite.mp4 & cloud.png has been provided for you. 
-source_file = "ignite.mp4"
+# The file sample_video_globe.mp4 & cloud.png has been provided for you. 
+source_file = "sample_video_globe.mp4"
 source_file_logo = "cloud.png"
 
 # Generate a random number that will be added to the naming of things so that you don't have to keep doing this during testing.
