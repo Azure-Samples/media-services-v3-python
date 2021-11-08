@@ -79,7 +79,7 @@ You can also use pip to uninstall libraries and install specific versions, inclu
 
 Copy the contents from the sample.env file that is in your forked repo in the root folder. Then, create your own .env file by clicking on Add file -> Create new file. Name the file *.env* and fill in the variables.
 
-Do not allow this .env file to be checked into your fork of the Git hub repository! This is disallowed in the .gitignore file, but be extra careful not to allow the credentials to leak into your source control for this file.
+Do not allow this .env file to be checked into your fork of the GitHub repository! This is disallowed in the .gitignore file, but be extra careful not to allow the credentials to leak into your source control for this file.
 
 All samples will load the root ".env" file first, and some of the samples add additional .env variables needed for the samples to work inside each sample folder. Make sure to check each sample for additional environment settings that are required.
 
