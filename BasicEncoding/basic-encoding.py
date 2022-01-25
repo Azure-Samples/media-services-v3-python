@@ -1,6 +1,7 @@
+from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.media import AzureMediaServices
-from azure.storage.blob import BlobServiceClient, BlobClient
+from azure.storage.blob import BlobServiceClient
 from azure.mgmt.media.models import (
   Asset,
   Transform,
@@ -9,30 +10,18 @@ from azure.mgmt.media.models import (
   Job,
   JobInputAsset,
   JobOutputAsset)
-import os, uuid, sys
+import os
 
 #Timer for checking job progress
 import time
 
-#This is only necessary for the random number generation
+#This is only necessary for the random number generation (uniqueness)
 import random
 
-# Set and get environment variables
-# Open sample.env, edit the values there and save the file as .env
-# (Not all of the values may be used in this sample code, but the .env file is reusable.)
-# Use config to use the .env file.
-print("Getting .env values")
-default_value = "<Fill out the .env>"
-account_name = os.getenv('ACCOUNTNAME',default_value)
-resource_group_name = os.getenv('RESOURCEGROUP',default_value)
-subscription_id = os.getenv('SUBSCRIPTIONID',default_value)
+#Get environmant variables
+load_dotenv()
 
-#### STORAGE ####
-# Values from .env and the blob url
-# For this sample you will use the storage account connection string to create and access assets
-storage_account_connection = os.getenv('STORAGEACCOUNTCONNECTION',default_value)
-
-# Get the default Azure credential from the environment variables AADCLIENTID and AADSECRET
+# Get the default Azure credential from the environment variables AZURE_CLIENT_ID and AZURE_CLIENT_SECRET and AZURE_TENTANT_ID
 default_credential = DefaultAzureCredential()
 
 # The file you want to upload.  For this example, put the file in the same folder as this script. 
@@ -46,6 +35,7 @@ uniqueness = random.randint(0,9999)
 in_asset_name = 'inputassetName' + str(uniqueness)
 in_alternate_id = 'inputALTid' + str(uniqueness)
 in_description = 'inputdescription' + str(uniqueness)
+
 # Create an Asset object
 # From the SDK
 # Asset(*, alternate_id: str = None, description: str = None, container: str = None, storage_account_name: str = None, **kwargs) -> None
@@ -64,13 +54,13 @@ output_asset = Asset(alternate_id=out_alternate_id,description=out_description)
 print("Creating AMS client")
 # From SDK
 # AzureMediaServices(credentials, subscription_id, base_url=None)
-client = AzureMediaServices(default_credential, subscription_id)
+client = AzureMediaServices(default_credential, os.getenv('SUBSCRIPTIONID'))
 
 # Create an input Asset
 print("Creating input asset " + in_asset_name)
 # From SDK
 # create_or_update(resource_group_name, account_name, asset_name, parameters, custom_headers=None, raw=False, **operation_config)
-inputAsset = client.assets.create_or_update(resource_group_name, account_name, in_asset_name, input_asset)
+inputAsset = client.assets.create_or_update( os.getenv("RESOURCEGROUP"), os.getenv("ACCOUNTNAME"), in_asset_name, input_asset)
 
 # An AMS asset is a container with a specific id that has "asset-" prepended to the GUID.
 # So, you need to create the asset id to identify it as the container
@@ -81,12 +71,12 @@ in_container = 'asset-' + inputAsset.asset_id
 print("Creating output asset " + out_asset_name)
 # From SDK
 # create_or_update(resource_group_name, account_name, asset_name, parameters, custom_headers=None, raw=False, **operation_config)
-outputAsset = client.assets.create_or_update(resource_group_name, account_name, out_asset_name, output_asset)
+outputAsset = client.assets.create_or_update(os.getenv("RESOURCEGROUP"), os.getenv("ACCOUNTNAME"), out_asset_name, output_asset)
 
 ### Use the Storage SDK to upload the video ###
 print("Uploading the file " + source_file)
 
-blob_service_client = BlobServiceClient.from_connection_string(storage_account_connection)
+blob_service_client = BlobServiceClient.from_connection_string(os.getenv('STORAGEACCOUNTCONNECTION'))
 
 # From SDK
 # get_blob_client(container, blob, snapshot=None)
@@ -117,8 +107,8 @@ print("Creating transform " + transform_name)
 # From SDK
 # Create_or_update(resource_group_name, account_name, transform_name, outputs, description=None, custom_headers=None, raw=False, **operation_config)
 transform = client.transforms.create_or_update(
-  resource_group_name=resource_group_name,
-  account_name=account_name,
+  resource_group_name=os.getenv("RESOURCEGROUP"),
+  account_name=os.getenv("ACCOUNTNAME"),
   transform_name=transform_name,
   parameters = transform)
 
@@ -137,12 +127,12 @@ outputs = JobOutputAsset(asset_name=out_asset_name)
 theJob = Job(input=input,outputs=[outputs])
 # From SDK
 # Create(resource_group_name, account_name, transform_name, job_name, parameters, custom_headers=None, raw=False, **operation_config)
-job: Job = client.jobs.create(resource_group_name,account_name,transform_name,job_name,parameters=theJob)
+job: Job = client.jobs.create(os.getenv("RESOURCEGROUP"),os.getenv('ACCOUNTNAME'),transform_name,job_name,parameters=theJob)
 
 ### Check the progress of the job ### 
 # From SDK
 # get(resource_group_name, account_name, transform_name, job_name, custom_headers=None, raw=False, **operation_config)
-job_state = client.jobs.get(resource_group_name,account_name,transform_name,job_name)
+job_state = client.jobs.get(os.getenv("RESOURCEGROUP"),os.getenv('ACCOUNTNAME'),transform_name,job_name)
 # First check
 print("First job check")
 print(job_state.state)
@@ -155,7 +145,7 @@ def countdown(t):
         print(timer, end="\r") 
         time.sleep(1) 
         t -= 1
-    job_current = client.jobs.get(resource_group_name,account_name,transform_name,job_name)
+    job_current = client.jobs.get(os.getenv("RESOURCEGROUP"),os.getenv('ACCOUNTNAME'),transform_name,job_name)
     if(job_current.state == "Finished"):
       print(job_current.state)
       # TODO: Download the output file using blob storage SDK
