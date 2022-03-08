@@ -243,10 +243,10 @@ az ams asset-filter update -g <resourceGroupName> -a <amsAccountName> --asset-na
 az ams asset-filter delete -g <resourceGroupName> -a <amsAccountName> --asset-name <assetName> -name <assetFilterName>
 # </AmsAssetFilterDelete>
 
+#type: command
+#short-summary: List all the asset filters of an Azure Media Services account.
 # <AmsAssetFilterList>
 az ams asset-filter list -g <resourceGroupName> -a <amsAccountName> --asset-name <assetName>
-    #type: command
-    #short-summary: List all the asset filters of an Azure Media Services account.
 # </AmsAssetFilterList>
 
 #type: command
