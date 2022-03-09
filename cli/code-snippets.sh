@@ -100,7 +100,7 @@ az ams account storage remove -g <resourceGroupName> -a <storageAccountName> -n 
 #short-summary: Create or update a service principal and configure its access to an Azure Media Services account.
 #long-summary: Service principal propagation throughout Azure Active Directory may take some extra seconds to complete. 
 # <AmsAccountSpCreatePassword>
-az ams account sp create -a <amsAccountName> -g <resourceGroupName> -n <mySpName> --password <l33t541t&p3pp3r> --role <Owner> --xml    
+az ams account sp create -a <amsAccountName> -g <resourceGroupName> -n <mySpName> --password <your password> --role <Owner> --xml    
 # </AmsAccountSpCreatePassword>
 
 # <AmsAccountSpCreateRole>
