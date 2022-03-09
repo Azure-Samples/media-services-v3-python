@@ -1,5 +1,6 @@
 ### DO NOT EDIT OR DELETE ###
 # This file is for Media Services documentation purposes.
+# It does not yet contain all of the SDK but will be added to iteratively.
 
 #<EnvironmentVariables>
 #Get environment variables
