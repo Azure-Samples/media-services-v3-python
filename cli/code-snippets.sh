@@ -344,6 +344,12 @@ az ams streaming-locator create -g <resourceGroupName> -a <amsAccountName> -n <s
 # </AmsStreamingLocatorCreate>
 
 #type: command
+#short-summary: Delete a streaming locator
+# <AmsStreamingLocatorDelete>
+az ams streaming-locator delete -g <resourceGroupName> -a <amsAccountName>
+# </AmsStreamingLocatorDelete>
+
+#type: command
 #short-summary: List all the streaming locators within an Azure Media Services account.
 # <AmsStreamingLocatorList>
 az ams streaming-locator list -g <resourceGroupName> -a <amsAccountName>
