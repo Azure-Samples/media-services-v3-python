@@ -522,7 +522,7 @@ az ams live-event reset -g <resourceGroupName> -a <amsAccountName>
             #az ams live-event update -a amsAccount -g resourceGroup -n liveEventName --ips 1.2.3.4/22 5.6.7.8/30
 # <AmsLiveEventUpdate>
 az ams live-event update -g <resourceGroupName> -a <amsAccountName> -n <liveEventName>
-# <AmsLiveEventUpdate>
+# </AmsLiveEventUpdate>
 
     #type: command
     #short-summary: Place the CLI in a waiting state until a condition of the live event is met.
