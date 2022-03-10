@@ -455,7 +455,7 @@ az ams streaming-endpoint akamai remove --identifier <identifier>
 #short-summary: Set the scale of a streaming endpoint.
 # <AmsStreamingEndpointScale>
 az ams streaming-endpoint scale --scale-units <x>
-# <AmsStreamingEndpointScale>
+# </AmsStreamingEndpointScale>
 
 #type: command
 #short-summary: Update the details of a streaming endpoint.
