@@ -380,6 +380,12 @@ az ams streaming-policy create -g <resourceGroupName> -a <amsAccountName> -n <st
 # </AmsStreamingPolicyCreate>
 
 #type: command
+#short-summary: Delete a streaming policy.
+# <AmsStreamingPolicyDelete>
+az ams streaming-policy delete -g <resourceGroupName> -a <amsAccountName> -n <streamingPolicyName>
+# </AmsStreamingPolicyDelete>
+
+#type: command
 #short-summary: List all the streaming policies within an Azure Media Services account.
 # <AmsStreamingPolicyList>
 az ams streaming-policy list -g <resourceGroupName> -a <amsAccountName>
