@@ -565,10 +565,10 @@ az ams live-output delete -g <resourceGroupName> -a <amsAccountName> --live-even
 az ams account-filter show  -g <resourceGroupName> -a <amsAccountName> -n <accountFilterName>
 # </AmsAccountFilterShow>
 
+#type: command
+#short-summary: List all the account filters of an Azure Media Services account.
 # <AmsAccountFilterList>
 az ams account-filter list -g <resourceGroupName> -a <amsAccountName>
-    #type: command
-    #short-summary: List all the account filters of an Azure Media Services account.
 # </AmsAccountFilterList>
 
 #type: command
