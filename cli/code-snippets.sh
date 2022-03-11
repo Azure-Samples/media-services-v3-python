@@ -581,14 +581,14 @@ az ams account-filter list -g <resourceGroupName> -a <amsAccountName>
 az ams account-filter create -a <amsAccountName> -g <resourceGroupName> -n <myFilter>
 # </AmsAccountFilterCreate>
 
+#type: command
+#short-summary: Update the details of an account filter.
 # <AmsAccountFilterUpdate>
 az ams account-filter update -g <resourceGroupName> -a <amsAccountName> -n <accountFilterName>
-    #type: command
-    #short-summary: Update the details of an account filter.
 # </AmsAccountFilterUpdate>
 
+#type: command
+#short-summary: Delete an account filter.
 # <AmsAccountFilterDelete>
 az ams account-filter delete -g <resourceGroupName> -a <amsAccountName> -n <accountFilterName>
-    #type: command
-    #short-summary: Delete an account filter.
 # </AmsAccountFilterDelete>
