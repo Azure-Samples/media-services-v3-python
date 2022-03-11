@@ -1,3 +1,4 @@
+#<CreateJob>
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.media import AzureMediaServices
@@ -160,3 +161,4 @@ def countdown(t):
 
 time_in_seconds = 10
 countdown(int(time_in_seconds))
+#</CreateJob>
