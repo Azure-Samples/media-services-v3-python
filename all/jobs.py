@@ -16,9 +16,10 @@ default_credential = DefaultAzureCredential()
 # From SDK
 # AzureMediaServices(credentials, subscription_id, base_url=None)
 client = AzureMediaServices(default_credential, os.getenv("SUBSCRIPTIONID"))
+#</JobSetup>
 
 #To create a job, see the BasicEncoding sample in this repo.
-#</JobSetup>
+
 
 #<JobDelete>
 # Delete a job
