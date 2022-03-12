@@ -1,5 +1,5 @@
 #author: IngridAtMicrosoft
-
+#<JobSetup>
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.media import AzureMediaServices
@@ -18,6 +18,7 @@ default_credential = DefaultAzureCredential()
 client = AzureMediaServices(default_credential, os.getenv("SUBSCRIPTIONID"))
 
 #To create a job, see the BasicEncoding sample in this repo.
+#</JobSetup>
 
 #<JobDelete>
 # Delete a job
