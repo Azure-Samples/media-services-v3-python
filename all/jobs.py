@@ -24,7 +24,7 @@ client = AzureMediaServices(default_credential, os.getenv("SUBSCRIPTIONID"))
 # From the SDK
 # delete(resource_group_name: str, account_name: str, transform_name: str, job_name: str, **kwargs: Any) -> None
 # from azure.mgmt.media import AzureMediaServices
-# Change myTransform to the name of the transform you that is associated with the job.
+# Change myTransform to the name of the transform that is associated with the job.
 # Change myJob to the name of the job that you want to delete.
 
 def deleteJob(resource_group_name,account_name,transform_name,job_name):
@@ -37,7 +37,7 @@ deleteJob(os.getenv("RESOURCEGROUP"),os.getenv("ACCOUNTNAME"),"myTransform","myJ
 # Cancel a job
 # From the SDK
 # cancel_job(resource_group_name: str, account_name: str, transform_name: str, job_name: str, **kwargs: Any) -> None
-# Change tranformName to the name of the transform you that is associated with the job.
+# Change tranformName to the name of the transform that is associated with the job.
 # Change jobName to the name of the job that you want to cancel.
 
 def cancelJob(resource_group_name,account_name,transform_name,job_name):
@@ -50,7 +50,7 @@ cancelJob(os.getenv("RESOURCEGROUP"),os.getenv("ACCOUNTNAME"),"transformName","j
 # Get the details of a job
 # From the SDK
 # get(resource_group_name: str, account_name: str, transform_name: str, job_name: str, **kwargs: Any) -> _models.Job
-# Change tranformName to the name of the transform you that is associated with the job.
+# Change tranformName to the name of the transform that is associated with the job.
 # Change jobName to the name of the job that you want to get.
 
 def getJob(resource_group_name,account_name,transform_name,job_name):
@@ -62,7 +62,7 @@ getJob(os.getenv("RESOURCEGROUP"),os.getenv("ACCOUNTNAME"),"transformName","jobN
 #<JobList>
 # List the jobs for a tranform
 #list(resource_group_name: str, account_name: str, transform_name: str, filter: Optional[str] = None, orderby: Optional[str] = None, **kwargs: Any) -> Iterable['_models.JobCollection']
-# Change tranformName to the name of the transform you for which you want a job list.
+# Change tranformName to the name of the transform for which you want a job list.
 
 def listJobs(resource_group_name,account_name,transform_name):
   jobs = client.jobs.list(resource_group_name,account_name,transform_name)
@@ -87,7 +87,7 @@ listJobs(os.getenv("RESOURCEGROUP"),os.getenv("ACCOUNTNAME"),"transformName")
 # and depending on the timing the priority update may be ignored.
 # From the SDK
 # update(resource_group_name: str, account_name: str, transform_name: str, job_name: str, parameters: "_models.Job", **kwargs: Any) -> _models.Job
-# Change tranformName to the name of the transform you that is associated with the job
+# Change tranformName to the name of the transform that is associated with the job
 # Change jobName to the name of the job that you want to update.
 
 # You don't necessarily have to pass a job object. You can pass JSON instead.
