@@ -2,7 +2,6 @@
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.media import AzureMediaServices
-from azure.storage.blob import BlobServiceClient
 from azure.mgmt.media.models import (Asset)
 import os
 #</AssetImports>
