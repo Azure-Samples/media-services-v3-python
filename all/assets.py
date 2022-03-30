@@ -40,6 +40,9 @@ createAsset(resourceGroupName,accountName,assetName,assetObj)
 #</CreateAsset>
 
 #<GetAsset>
+# Set the name of the asset for which you want to get properties.
+assetName = "MyAsset"
+
 # From SDK
 # get(resource_group_name: str, account_name: str, asset_name: str, **kwargs: Any) -> _models.Asset
 def getAsset(resource_group_name,account_name,asset_name):
@@ -51,6 +54,8 @@ getAsset(resourceGroupName,accountName,assetName)
 #</GetAsset>
 
 #<GetAssetEncryptionKey>
+# Set the name of the asset for which you want to get the asset encryption key.
+assetName = "MyAsset"
 # From SDK
 # get_encryption_key(resource_group_name: str, account_name: str, asset_name: str, **kwargs: Any) 
 # -> _models.StorageEncryptedAssetDecryptionData
@@ -82,6 +87,9 @@ listAssets(resourceGroupName,accountName)
 #</ListAssetsContainerSAS>
 
 #<ListAssetStreamingLocators>
+# Set the name of the asset for which you want a streaming locator list
+assetName = "MyAsset"
+
 # From SDK
 # list_streaming_locators(resource_group_name: str, account_name: str, asset_name: str, **kwargs: Any) -> _models.ListStreamingLocatorsResponse
 def listStreamingLocators(resource_group_name, account_name, asset_name):
@@ -96,8 +104,14 @@ listStreamingLocators(resourceGroupName,accountName,assetName)
 #</ListAssetStreamingLocators>
 
 #<UpdateAsset>
+
+
 # From SDK
 # update(resource_group_name: str, account_name: str, asset_name: str, parameters: "_models.Asset", **kwargs: Any) -> _models.Asset
+# Set the name of the asset that you want to update
+assetName = "MyAsset"
+
+#Create an asset object for updating
 assetObj1 = Asset(description="My new description.")
 
 def updateAsset(resource_group_name, account_name, asset_name,parameters):
@@ -107,6 +121,9 @@ updateAsset(resourceGroupName,accountName,assetName,assetObj1)
 #</UpdateAsset>
 
 #<DeleteAsset>
+# Set the name of the asset that you want to delete
+assetName = "MyAsset"
+
 # From SDK
 # delete(resource_group_name: str, account_name: str, asset_name: str, **kwargs: Any) -> None
 def deleteAsset(resource_group,account_name,asset_name):
