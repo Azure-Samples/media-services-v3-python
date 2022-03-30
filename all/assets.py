@@ -18,7 +18,7 @@ clientId = os.getenv("AZURE_CLIENT_ID")
 storageAccountName=os.getenv("STORAGEACCOUNTNAME")
 #</EnvironmentVariables>
 
-#<CreateAMSClinet>
+#<CreateAMSClient>
 # Create the Media Services client and authenticate using the DefaultAzureCredential
 default_credential = DefaultAzureCredential()
 client = AzureMediaServices(default_credential, subscriptionId)
@@ -38,7 +38,7 @@ assetObj = Asset(alternate_id="myAlternateId",description="My description")
 def createAsset(account_name, resource_group_name, asset_name,asset):
   thisAsset = client.assets.create_or_update(account_name, resource_group_name, asset_name,asset)
 
-#createAsset(resourceGroupName,accountName,assetName,assetObj)
+createAsset(resourceGroupName,accountName,assetName,assetObj)
 #</CreateAsset>
 
 #<GetAsset>
@@ -47,7 +47,7 @@ def getAsset(resource_group_name,account_name,asset_name):
   #You can get any of the properties of an asset. Here we are printing the asset name.
   print(results.name)
 
-#getAsset(resourceGroupName,accountName,assetName)
+getAsset(resourceGroupName,accountName,assetName)
 #</GetAsset>
 
 #<GetAssetEncryptionKey>
@@ -56,7 +56,7 @@ def getAssetEncKey(resource_group_name,account_name,asset_name):
   results = client.assets.get_encryption_key(resource_group_name,account_name,asset_name)
   print(results)
 
-#getAssetEncKey(resourceGroupName,accountName,assetName)
+getAssetEncKey(resourceGroupName,accountName,assetName)
 #</GetAssetEncryptionKey>
 
 #<ListAssets>
@@ -66,13 +66,13 @@ def listAssets(resource_group_name, account_name):
   for result in results:
     print(result.name)
 
-#listAssets(resourceGroupName,accountName)
-##</ListAssets>
+listAssets(resourceGroupName,accountName)
+#</ListAssets>
 
 #<ListAssetsContainerSAS>
 # TO DO
 #list_container_sas(resource_group_name,account_name,asset_name, parameters: "_models.ListContainerSasInput", **kwargs: Any) -> _models.AssetContainerSas
-#<ListAssetsContainerSAS>
+#</ListAssetsContainerSAS>
 
 #<ListAssetStreamingLocators>
 def listStreamingLocators(resource_group_name, account_name, asset_name):
@@ -93,7 +93,7 @@ assetObj1 = Asset(description="My new description.")
 def updateAsset(resource_group_name, account_name, asset_name,parameters):
   client.assets.update(resource_group_name,account_name,asset_name,assetObj1)
 
-#updateAsset(resourceGroupName,accountName,assetName,assetObj1)
+updateAsset(resourceGroupName,accountName,assetName,assetObj1)
 #</UpdateAsset>
 
 #<DeleteAsset>
