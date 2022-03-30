@@ -1,3 +1,6 @@
+# These code snippets are used in Azure Media Services documentation.
+# DO NOT EDIT
+
 #<AssetImports>
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
