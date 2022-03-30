@@ -107,8 +107,6 @@ listStreamingLocators(resourceGroupName,accountName,assetName)
 #</ListAssetStreamingLocators>
 
 #<UpdateAsset>
-
-
 # From SDK
 # update(resource_group_name: str, account_name: str, asset_name: str, parameters: "_models.Asset", **kwargs: Any) -> _models.Asset
 # Set the name of the asset that you want to update
