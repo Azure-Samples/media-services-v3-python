@@ -62,8 +62,8 @@ assetName = "MyAsset"
 # From SDK
 # get_encryption_key(resource_group_name: str, account_name: str, asset_name: str, **kwargs: Any) 
 # -> _models.StorageEncryptedAssetDecryptionData
+# If an encryption key doesn't exist yet, the results will tell you.
 def getAssetEncKey(resource_group_name,account_name,asset_name):
-  #If an encryption key doesn't exist yet, the results will tell you.
   results = client.assets.get_encryption_key(resource_group_name,account_name,asset_name)
   print(results)
 
