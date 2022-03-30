@@ -18,9 +18,11 @@ clientId = os.getenv("AZURE_CLIENT_ID")
 storageAccountName=os.getenv("STORAGEACCOUNTNAME")
 #</EnvironmentVariables>
 
+#<CreateAMSClinet>
 # Create the Media Services client and authenticate using the DefaultAzureCredential
 default_credential = DefaultAzureCredential()
 client = AzureMediaServices(default_credential, subscriptionId)
+#</CreateAMSClient>
 
 #<CreateAsset>
 #Create an Asset object
