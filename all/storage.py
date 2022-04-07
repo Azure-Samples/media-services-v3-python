@@ -40,6 +40,7 @@ client = AzureMediaServices(default_credential, subscriptionId)
 #</CreateAMSClient>
 
 #<CreateStorageClient>
+# Create clients for storage
 resource_client = ResourceManagementClient(default_credential, subscriptionId)
 storage_client = StorageManagementClient(default_credential, subscriptionId)
 #</CreateStorageClient>
