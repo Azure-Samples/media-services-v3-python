@@ -93,8 +93,8 @@ print(f"Creating Standard Encoding transform named: {transform_name}")
 
 # For this snippet, we are using 'BuiltInStandardEncoderPreset'
 transform_output = TransformOutput(
-  preset = BuiltInStandardEncoderPreset(
-    preset_name = "ContentAwareEncoding",
+  preset=BuiltInStandardEncoderPreset(
+    preset_name="ContentAwareEncoding",
     # Configurations can be used to control values used by the Content Aware Encoding Preset.
     # See the next sample for Encoding_H264_ContentAware_Constrained for an example of using this property.
     configurations={}
@@ -117,7 +117,7 @@ transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
   transform_name=transform_name,
-  parameters = myTransform)
+  parameters=myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 

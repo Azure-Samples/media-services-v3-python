@@ -116,7 +116,7 @@ print(f"Creating Built-in Standard CopyCodec with Proxy Encoding transform named
 
 # For this snippet, we are using 'BuiltInStandardEncoderPreset'
 transform_output = TransformOutput(
-  preset = BuiltInStandardEncoderPreset(
+  preset=BuiltInStandardEncoderPreset(
     # uses the built in SaaS copy codec preset, which copies source audio and video to MP4 tracks. 
     # This also generates a fast proxy. See notes at top of this file on constraints and use case.
     preset_name="saasProxyCopyCodec"   
@@ -139,7 +139,7 @@ transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
   transform_name=transform_name,
-  parameters = myTransform)
+  parameters=myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 
@@ -192,22 +192,22 @@ if outputAsset is not None:
   streamingLocator = StreamingLocator(asset_name=out_asset_name, streaming_policy_name="Predefined_ClearStreamingOnly")
   # Create Streaming Locator
   locator = client.streaming_locators.create(
-    resource_group_name = RESOURCE_GROUP,
-    account_name = ACCOUNT_NAME,
-    streaming_locator_name= locator_name,
-    parameters = streamingLocator
+    resource_group_name=RESOURCE_GROUP,
+    account_name=ACCOUNT_NAME,
+    streaming_locator_name=locator_name,
+    parameters=streamingLocator
   )
   if locator.name is not None:
-    streamingEndpoint = client.streaming_endpoints.get(
-      resource_group_name = RESOURCE_GROUP,
-      account_name = ACCOUNT_NAME,
-      streaming_endpoint_name = "default"
+    streamingEndpoint=client.streaming_endpoints.get(
+      resource_group_name=RESOURCE_GROUP,
+      account_name=ACCOUNT_NAME,
+      streaming_endpoint_name="default"
     )
     
     paths = client.streaming_locators.list_paths(
-      resource_group_name = RESOURCE_GROUP,
-      account_name = ACCOUNT_NAME,
-      streaming_locator_name = locator_name 
+      resource_group_name=RESOURCE_GROUP,
+      account_name=ACCOUNT_NAME,
+      streaming_locator_name=locator_name 
     )
 
     if paths.streaming_paths:

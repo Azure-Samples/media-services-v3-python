@@ -187,7 +187,7 @@ transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
   transform_name=transform_name,
-  parameters = myTransform)
+  parameters=myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 
@@ -199,12 +199,12 @@ files = (source_file, overlay_file)
 jobVideoInputAsset = JobInputAsset(asset_name=in_asset_name)
 
 jobInputOverlay = JobInputAsset(
-  asset_name = overlay_asset_name,
-  label = overlay_label   # Order does not matter here, it is the "label" used on the Filter and the jobInput Overlay that is important!
+  asset_name=overlay_asset_name,
+  label=overlay_label   # Order does not matter here, it is the "label" used on the Filter and the jobInput Overlay that is important!
 )
 
 # Create a list of job inputs - we will add both the video and overlay image assets here as the inputs to the job.
-job_inputs = [   
+job_inputs=[   
     jobVideoInputAsset,
     jobInputOverlay
 ]

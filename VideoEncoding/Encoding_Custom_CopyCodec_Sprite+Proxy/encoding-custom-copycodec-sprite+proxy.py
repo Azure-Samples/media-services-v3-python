@@ -123,8 +123,8 @@ print(f"Creating Built-in Standard CopyCodec with Proxy Encoding transform named
 # For this snippet, we are using 'BuiltInStandardEncoderPreset'
 transform_output = [
   TransformOutput(
-    preset = BuiltInStandardEncoderPreset(
-      preset_name = "SaasSourceAligned360pOnly"       # There are some undocumented magical presets in our toolbox that do fun stuff - this one is going to copy the codecs from the source and also generate a 360p proxy file.
+    preset=BuiltInStandardEncoderPreset(
+      preset_name="SaasSourceAligned360pOnly"       # There are some undocumented magical presets in our toolbox that do fun stuff - this one is going to copy the codecs from the source and also generate a 360p proxy file.
       
       # Other magical presets to play around with, that might (or might not) work for your source video content...
       # "SaasCopyCodec" - this just copies the source video and audio into an MP4 ready for streaming.  The source has to be H264 and AAC with CBR encoding and no B frames typically.
@@ -141,17 +141,17 @@ transform_output = [
   ),
   TransformOutput(
     # uses the Standard Encoder Preset to generate copy the source audio and video to an output track, and generate a proxy and a sprite
-    preset = StandardEncoderPreset(
+    preset=StandardEncoderPreset(
       # CopyVideo is a custom copy codec - it copies the source video track directly to the output MP4 file
       # CopyAudio is a custom copy codec - it copies the audio track from the source to the ouput MP4 file
       # JpgImage - generates a set of thumbnails in one Jpg file (thumbnail sprite) 
-      codecs = [CopyVideo(), CopyAudio(), JpgImage(start="0%", step="5%", range="100%", sprite_column=10, layers=[JpgLayer(width="20%", height="20%", quality=85)])],
+      codecs=[CopyVideo(), CopyAudio(), JpgImage(start="0%", step="5%", range="100%", sprite_column=10, layers=[JpgLayer(width="20%", height="20%", quality=85)])],
       
       # Specify the format for the output files - one for video+audio, and another for the thumbnails
       # Mux the H.264 video and AAC audio into MP4 files, using basename, label, bitrate and extension macros
       # Note that since you have multiple H264Layers defined above, you have to use a macro that produces unique names per H264Layer
       # Either {Label} or {Bitrate} should suffice
-      formats = [Mp4Format(filename_pattern = "CopyCodec-{Basename}{Extension}"), JpgFormat(filename_pattern = "sprite-{Basename}-{Index}{Extension}")]  
+      formats=[Mp4Format(filename_pattern="CopyCodec-{Basename}{Extension}"), JpgFormat(filename_pattern="sprite-{Basename}-{Index}{Extension}")]  
     ),
     # What should we do with the job if there is an error?
     on_error=OnErrorType.STOP_PROCESSING_JOB,
@@ -172,7 +172,7 @@ transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
   transform_name=transform_name,
-  parameters = myTransform)
+  parameters=myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 
@@ -231,22 +231,22 @@ if outputAsset is not None:
     streamingLocator = StreamingLocator(asset_name=out_asset_name, streaming_policy_name="Predefined_ClearStreamingOnly")
     # Create Streaming Locator
     locator = client.streaming_locators.create(
-        resource_group_name = RESOURCE_GROUP,
-        account_name = ACCOUNT_NAME,
-        streaming_locator_name= locator_name,
-        parameters = streamingLocator
+        resource_group_name=RESOURCE_GROUP,
+        account_name=ACCOUNT_NAME,
+        streaming_locator_name=locator_name,
+        parameters=streamingLocator
     )
     if locator.name is not None:
         streamingEndpoint = client.streaming_endpoints.get(
-            resource_group_name = RESOURCE_GROUP,
-            account_name = ACCOUNT_NAME,
-            streaming_endpoint_name = "default"
+            resource_group_name=RESOURCE_GROUP,
+            account_name=ACCOUNT_NAME,
+            streaming_endpoint_name="default"
         )
     
         paths = client.streaming_locators.list_paths(
-            resource_group_name = RESOURCE_GROUP,
-            account_name = ACCOUNT_NAME,
-            streaming_locator_name = locator_name 
+            resource_group_name=RESOURCE_GROUP,
+            account_name=ACCOUNT_NAME,
+            streaming_locator_name=locator_name 
         )
     
         if paths.streaming_paths:

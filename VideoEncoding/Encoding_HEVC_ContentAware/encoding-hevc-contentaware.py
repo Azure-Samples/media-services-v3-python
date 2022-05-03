@@ -95,11 +95,11 @@ print(f"Creating Standard Encoding transform named: {transform_name}")
 
 # For this snippet, we are using 'BuiltInStandardEncoderPreset'
 transform_output = TransformOutput(
-  preset = BuiltInStandardEncoderPreset(
-    preset_name = EncoderNamedPreset.H265_CONTENT_AWARE_ENCODING,
+  preset=BuiltInStandardEncoderPreset(
+    preset_name=EncoderNamedPreset.H265_CONTENT_AWARE_ENCODING,
     # Configurations can be used to control values used by the Content Aware Encoding Preset.
     # See the next sample for Encoding_HEVC_ContentAware_Constrained for an example of using this property
-    configurations = {}
+    configurations={}
   ),
   # What should we do with the job if there is an error?
   on_error=OnErrorType.STOP_PROCESSING_JOB,
@@ -119,7 +119,7 @@ transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
   transform_name=transform_name,
-  parameters = myTransform)
+  parameters=myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 

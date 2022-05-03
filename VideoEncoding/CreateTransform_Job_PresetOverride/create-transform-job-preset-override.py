@@ -123,16 +123,16 @@ print(f"Creating empty, blank, Standard Encoding transform named: {transform_nam
 # For this snippet, we are using 'BuiltInStandardEncoderPreset'
 # Create a new Content Aware Encoding Preset using the Preset Configuration
 transform_output = TransformOutput(
-  preset = StandardEncoderPreset(
-    codecs = [
-        H264Video(layers = [H264Layer(bitrate = 1000000)])      # Units are in bits per second and not kbps or Mbps - 1 Mbps or 1,000 kbps
+  preset=StandardEncoderPreset(
+    codecs=[
+        H264Video(layers=[H264Layer(bitrate=1000000)])      # Units are in bits per second and not kbps or Mbps - 1 Mbps or 1,000 kbps
     ],
     # Specify the format for the output files - one for video+audio, and another for the thumbnails
-    formats = [
+    formats=[
       # Mux the H.264 video and AAC audio into MP4 files, using basename, label, bitrate and extension macros
       # Note that since you have multiple H264Layers defined above, you have to use a macro that produces unique names per H264Layer
       # Either {Label} or {Bitrate} should suffice
-      Mp4Format(filename_pattern = "Video-{Basename}-{Label}-{Bitrate}{Extension}")
+      Mp4Format(filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}")
     ]
   ),
   # What should we do with the job if there is an error?
@@ -171,30 +171,30 @@ print(f"Creating a new custom preset override and submitting the job to the empt
 
 # Create a new Preset Override to define a custom standard encoding preset
 standard_preset_h264 = StandardEncoderPreset(
-    codecs = [
+    codecs=[
         H264Video(
             # Next, add a H264Video for the video encoding
-            key_frame_interval = timedelta(seconds=2),
-            complexity = H264Complexity.SPEED,
-            layers = [
+            key_frame_interval=timedelta(seconds=2),
+            complexity=H264Complexity.SPEED,
+            layers=[
                 H264Layer(
-                    bitrate = 3600000,  # Units are in bits per second and not kbps or Mbps - 3.6 Mbps or 3,600 kbps
-                    width = "1280",
-                    height = "720",
-                    label = "HD-3600kbps"   # This label is used to modify the file name in the output formats
+                    bitrate=3600000,  # Units are in bits per second and not kbps or Mbps - 3.6 Mbps or 3,600 kbps
+                    width="1280",
+                    height="720",
+                    label="HD-3600kbps"   # This label is used to modify the file name in the output formats
                 )
             ]
         ), 
         AacAudio(
             # Add an AAC Audio Layer for the audio encoding
-            channels = 2,
-            sampling_rate = 48000,
-            bitrate = 128000,
-            profile = AacAudioProfile.AAC_LC
+            channels=2,
+            sampling_rate=48000,
+            bitrate=128000,
+            profile=AacAudioProfile.AAC_LC
         )
     ],
-    formats = [
-        Mp4Format(filename_pattern = "Video-{Basename}-{Label}-{Bitrate}{Extension}")
+    formats=[
+        Mp4Format(filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}")
     ]
 )
 
@@ -208,32 +208,32 @@ job: Job = client.jobs.create(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_
 # Next, we will create another preset override that uses HEVC instead and submit it against the same simple transform
 # Create a new Preset Override to define a custom standard encoding preset
 standard_preset_HEVC = StandardEncoderPreset(
-    codecs = [
+    codecs=[
         H265Video(
             # Next, add a H265Video for the video encoding
-            key_frame_interval = timedelta(seconds=2),
-            complexity = H264Complexity.SPEED,
-            layers = [
+            key_frame_interval=timedelta(seconds=2),
+            complexity=H264Complexity.SPEED,
+            layers=[
                 H265Layer(
-                    bitrate = 1800000, # Units are in bits per second and not kbps or Mbps - 3.6 Mbps or 3,600 kbps
-                    max_bitrate = 1800000,
-                    width = "1280",
-                    height = "720",
-                    b_frames = 4,
-                    label = "HD-1800kbps" # This label is used to modify the file name in the output formats
+                    bitrate=1800000, # Units are in bits per second and not kbps or Mbps - 3.6 Mbps or 3,600 kbps
+                    max_bitrate=1800000,
+                    width="1280",
+                    height="720",
+                    b_frames=4,
+                    label="HD-1800kbps" # This label is used to modify the file name in the output formats
                 )
             ]
         ), 
         AacAudio(
             # Add an AAC audio layer for the audio encoding
-            channels = 2,
-            sampling_rate = 48000,
-            bitrate = 128000,
-            profile = AacAudioProfile.AAC_LC    
+            channels=2,
+            sampling_rate=48000,
+            bitrate=128000,
+            profile=AacAudioProfile.AAC_LC    
         )
     ],
     formats=[
-        Mp4Format(filename_pattern = "Video-{Basename}-{Label}-{Bitrate}{Extension}")
+        Mp4Format(filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}")
     ]
 )
 
@@ -286,7 +286,6 @@ def countdown(t):
 
 time_in_seconds = 10
 countdown(int(time_in_seconds))
-
 
 job_state2 = client.jobs.get(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name_HEVC)
 # Second job check

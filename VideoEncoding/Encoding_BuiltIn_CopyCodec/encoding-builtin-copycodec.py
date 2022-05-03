@@ -104,7 +104,7 @@ print(f"Creating Built-in Standard Encoding transform named: {transform_name}")
 
 # For this snippet, we are using 'BuiltInStandardEncoderPreset'
 transform_output = TransformOutput(
-  preset = BuiltInStandardEncoderPreset(
+  preset=BuiltInStandardEncoderPreset(
       preset_name="saasCopyCodec"   # uses the built in SaaS copy codec preset, which copies source audio and video to MP4 tracks. See notes at top of this file on constraints.
   ),
   # What should we do with the job if there is an error?

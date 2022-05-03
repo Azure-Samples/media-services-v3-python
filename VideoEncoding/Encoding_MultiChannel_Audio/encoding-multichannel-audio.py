@@ -116,14 +116,14 @@ print(f"Creating Standard Encoding transform named: {transform_name}" )
 # TrackDescriptor(SelectAudioTrackById(track_id = 0, channel_mapping = ChannelMapping.STEREO_LEFT))
 # TypeError: TrackDescriptor.__init__() takes 1 positional argument but 2 were given
 trackList = [
-  SelectAudioTrackById(track_id = 0, channel_mapping = ChannelMapping.STEREO_LEFT),
-  SelectAudioTrackById(track_id = 1, channel_mapping = ChannelMapping.STEREO_RIGHT),
-  SelectAudioTrackById(track_id = 2, channel_mapping = ChannelMapping.FRONT_LEFT),
-  SelectAudioTrackById(track_id = 3, channel_mapping = ChannelMapping.FRONT_RIGHT),
-  SelectAudioTrackById(track_id = 4, channel_mapping = ChannelMapping.CENTER),
-  SelectAudioTrackById(track_id = 5, channel_mapping = ChannelMapping.LOW_FREQUENCY_EFFECTS),
-  SelectAudioTrackById(track_id = 6, channel_mapping = ChannelMapping.BACK_LEFT),
-  SelectAudioTrackById(track_id = 7, channel_mapping = ChannelMapping.BACK_RIGHT)
+  SelectAudioTrackById(track_id=0, channel_mapping=ChannelMapping.STEREO_LEFT),
+  SelectAudioTrackById(track_id=1, channel_mapping=ChannelMapping.STEREO_RIGHT),
+  SelectAudioTrackById(track_id=2, channel_mapping=ChannelMapping.FRONT_LEFT),
+  SelectAudioTrackById(track_id=3, channel_mapping=ChannelMapping.FRONT_RIGHT),
+  SelectAudioTrackById(track_id=4, channel_mapping=ChannelMapping.CENTER),
+  SelectAudioTrackById(track_id=5, channel_mapping=ChannelMapping.LOW_FREQUENCY_EFFECTS),
+  SelectAudioTrackById(track_id=6, channel_mapping=ChannelMapping.BACK_LEFT),
+  SelectAudioTrackById(track_id=7, channel_mapping=ChannelMapping.BACK_RIGHT)
 ]
 
 # Create an input definition passing in the source file name and the list of included track mappings from that source file we made above.
@@ -132,18 +132,18 @@ inputDefinitions = [InputFile(filename=source_file, included_tracks=trackList)]
 # For this snippet, we are using 'StandardEncoderPreset'
 # Create a new Content Aware Encoding Preset using the Preset Configuration
 transform_output = TransformOutput(
-  preset = StandardEncoderPreset(
-    codecs = [AacAudio(channels = 2, sampling_rate = 48000, bitrate = 128000, profile = AacAudioProfile.AAC_LC, label = "stereo"),
-              AacAudio(channels = 6, sampling_rate = 48000, bitrate = 320000, profile = AacAudioProfile.AAC_LC, label = "surround")
+  preset=StandardEncoderPreset(
+    codecs=[AacAudio(channels=2, sampling_rate=48000, bitrate=128000, profile=AacAudioProfile.AAC_LC, label="stereo"),
+            AacAudio(channels=6, sampling_rate=48000, bitrate=320000, profile=AacAudioProfile.AAC_LC, label="surround")
     ],
     # Specify the format for the output files - one for AAC audio outputs to MP4
-    formats = [
+    formats=[
       # Mux the AAC audio into MP4 files, using basename, label, bitrate and extension macros
       # Note that since you have multiple AAC outputs defined above, you have to use a macro that produces unique names per AAC Layer
       # Either {Label} or {Bitrate} should suffice
       # By creating outputFiles and assigning the labels we can control which output tracks are muxed into the Mp4 files
       # If you choose to mux both the stereo and surround tracks into a single MP4 output, you can remove the outputFiles and remove the second MP4 format object. 
-      Mp4Format(filename_pattern = "{Basename}-{Label}-{Bitrate}{Extension}", output_files = [OutputFile(labels=["stereo", "surround"])])
+      Mp4Format(filename_pattern="{Basename}-{Label}-{Bitrate}{Extension}", output_files=[OutputFile(labels=["stereo", "surround"])])
     ]
   ),
   # What should we do with the job if there is an error?
@@ -164,7 +164,7 @@ transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
   transform_name=transform_name,
-  parameters = myTransform)
+  parameters=myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 

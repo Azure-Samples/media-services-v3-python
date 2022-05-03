@@ -104,8 +104,8 @@ print(f"Creating Standard Encoding transform named: {transform_name}")
 
 # For this snippet, we are using 'StandardEncoderPreset'
 transform_output = TransformOutput(
-  preset = StandardEncoderPreset(
-    codecs = [
+  preset=StandardEncoderPreset(
+    codecs=[
       AacAudio(
         channels=2,
         sampling_rate=48000,
@@ -113,19 +113,19 @@ transform_output = TransformOutput(
         profile=AacAudioProfile.AAC_LC
       ),
       H264Video(
-        key_frame_interval= timedelta(seconds=2),
+        key_frame_interval=timedelta(seconds=2),
         complexity=H264Complexity.BALANCED,
         layers=[
           H264Layer(
-            bitrate= 3600000,   # Units are in bits per second and not kbps or Mbps - 3.6Mbps or 3,600 kbps
-            width= 1200,
+            bitrate=3600000,   # Units are in bits per second and not kbps or Mbps - 3.6Mbps or 3,600 kbps
+            width=1200,
             height=720,
             buffer_window=timedelta(seconds=5),
             profile="Auto",
             label="HD-3600kbps"   # This label is used to modify the file name in the output formats
           ),
           H264Layer(
-            bitrate= 1600000,   # Units are in bits per second and not kbps or Mbps - 3.6Mbps or 3,600 kbps
+            bitrate=1600000,   # Units are in bits per second and not kbps or Mbps - 3.6Mbps or 3,600 kbps
             width= 960,
             height=540,
             buffer_window=timedelta(seconds=5),
@@ -133,8 +133,8 @@ transform_output = TransformOutput(
             label="SD-1600kbps"   # This label is used to modify the file name in the output formats
           ),
           H264Layer(
-            bitrate= 600000,   # Units are in bits per second and not kbps or Mbps - 3.6Mbps or 3,600 kbps
-            width= 640,
+            bitrate=600000,   # Units are in bits per second and not kbps or Mbps - 3.6Mbps or 3,600 kbps
+            width=640,
             height=480,
             buffer_window=timedelta(seconds=5),
             profile="Auto",
@@ -186,7 +186,7 @@ transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
   transform_name=transform_name,
-  parameters = myTransform)
+  parameters=myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 

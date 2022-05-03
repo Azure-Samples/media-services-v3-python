@@ -106,13 +106,13 @@ presetConfig = PresetConfigurations(
     # The output includes both audio and video.
     interleave_output=InterleaveOutput.INTERLEAVED_OUTPUT,
     # The key frame interval in seconds. Example: set as 2 to reduce the playback buffering for some players.
-    key_frame_interval_in_seconds= 2,
+    key_frame_interval_in_seconds=2,
     # The maximum bitrate in bits per second (threshold for the top video layer). Example: set max_bitrate_bps as 6000000 to avoid producing very high bitrate outputs for contents with high complexity
-    max_bitrate_bps= 3000000,
+    max_bitrate_bps=3000000,
     # The minimum bitrate in bits per second (threshold for the bottom video layer). Example: set min_bitrate_bps as 200000 to have a bottom layer that covers users with low network bandwidth.
-    min_bitrate_bps= 200000,
+    min_bitrate_bps=200000,
     #The maximum height of output video layers. Example: set max_height as 720 to produce output layers up to 720P even if the input is 4K.
-    max_height= 720,
+    max_height=720,
     # The minimum height of output video layers. Example: set min_height as 360 to avoid output layers of smaller resolutions like 180P.
     min_height=270,
     #  The maximum number of output video layers. Example: set max_layers as 4 to make sure at most 4 output layers are produced to control the overall cost of the encoding job.
@@ -122,10 +122,10 @@ presetConfig = PresetConfigurations(
 # For this snippet, we are using 'BuiltInStandardEncoderPreset'
 # Create a new Content Aware Encoding Preset using the Preset Configuration
 transform_output = TransformOutput(
-  preset = BuiltInStandardEncoderPreset(
-    preset_name = EncoderNamedPreset.H265_CONTENT_AWARE_ENCODING,
+  preset=BuiltInStandardEncoderPreset(
+    preset_name=EncoderNamedPreset.H265_CONTENT_AWARE_ENCODING,
     # Configurations can be used to control values used by the Content Aware Encoding Preset.
-    configurations = presetConfig
+    configurations=presetConfig
   ),
   # What should we do with the job if there is an error?
   on_error=OnErrorType.STOP_PROCESSING_JOB,
@@ -145,7 +145,7 @@ transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
   transform_name=transform_name,
-  parameters = myTransform)
+  parameters=myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 

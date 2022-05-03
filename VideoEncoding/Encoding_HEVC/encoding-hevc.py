@@ -104,8 +104,8 @@ print(f"Creating Standard Encoding transform named: {transform_name}")
 
 # For this snippet, we are using 'StandardEncoderPreset'
 transform_output = TransformOutput(
-  preset = StandardEncoderPreset(
-      codecs= [AacAudio(channels=2, sampling_rate=48000, bitrate=128000, profile=AacAudioProfile.AAC_LC),
+  preset=StandardEncoderPreset(
+      codecs=[AacAudio(channels=2, sampling_rate=48000, bitrate=128000, profile=AacAudioProfile.AAC_LC),
                H265Video(key_frame_interval=timedelta(seconds=2), complexity=H265Complexity.BALANCED, layers = [H265Layer(bitrate=1800000, max_bitrate=1800000, width="1280", height="720", b_frames=4, label= "HD-1800kbps"),
                                                                                                                 H265Layer(bitrate=800000, max_bitrate=800000, width="960", height="540", b_frames=4, label="SD-800kbps"),
                                                                                                                 H265Layer(bitrate=300000, max_bitrate=300000, width="640", height="480", b_frames=4, label="SD-300kbps")],
@@ -150,7 +150,7 @@ transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
   transform_name=transform_name,
-  parameters = myTransform)
+  parameters=myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 

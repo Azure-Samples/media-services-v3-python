@@ -96,8 +96,8 @@ print(f"Creating Standard Encoding transform named: {transform_name}")
 
 # For this snippet, we are using 'StandardEncoderPreset'
 transform_output = TransformOutput(
-  preset = StandardEncoderPreset(
-    codecs = [
+  preset=StandardEncoderPreset(
+    codecs=[
       AacAudio(
         channels=2,
         sampling_rate=48000,
@@ -107,7 +107,7 @@ transform_output = TransformOutput(
       )
     ],
     # Specify the format for the output files - one for video+audio, and another for the thumbnails
-    formats = [
+    formats=[
       # Mux the AAC audio into MP4 files, using basename, label, bitrate and extension macros
       # Either {Label} or {Bitrate} should suffice
       Mp4Format(

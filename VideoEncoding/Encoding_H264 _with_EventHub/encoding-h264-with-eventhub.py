@@ -127,66 +127,66 @@ print(f"Creating Standard Encoding transform named: {transform_name}")
 
 # For this snippet, we are using 'StandardEncoderPreset'
 transform_output = TransformOutput(
-  preset = StandardEncoderPreset(
-    codecs = [
+  preset=StandardEncoderPreset(
+    codecs=[
       AacAudio(
         # Add an AAC Audio Layer for the audio encoding
-        channels = 2,
-        sampling_rate = 48000,
-        bitrate = 128000,
-        profile = AacAudioProfile.AAC_LC
+        channels=2,
+        sampling_rate=48000,
+        bitrate=128000,
+        profile=AacAudioProfile.AAC_LC
       ),
       H264Video(
         # Next, add a H264Video for the video encoding
-        key_frame_interval = timedelta(seconds = 2),
-        complexity = H264Complexity.BALANCED,
-        layers = [
+        key_frame_interval=timedelta(seconds=2),
+        complexity=H264Complexity.BALANCED,
+        layers=[
           H264Layer(
-            bitrate = 3600000,  # Units are in bits per second and not kbps or Mbps - 3.6 Mbps or 3,600 kbps
-            width = "1280",
-            height = "720",
-            buffer_window =timedelta(seconds = 5),
-            profile = "Auto",
-            label = "HD-3600kbps" # This label is used to modify the file name in the output formats
+            bitrate=3600000,  # Units are in bits per second and not kbps or Mbps - 3.6 Mbps or 3,600 kbps
+            width="1280",
+            height="720",
+            buffer_window=timedelta(seconds=5),
+            profile="Auto",
+            label="HD-3600kbps" # This label is used to modify the file name in the output formats
           ),
           H264Layer(
-            bitrate = 1600000,  # Units are in bits per second and not kbps or Mbps - 1.6 Mbps or 1600 kbps
-            width = "960",
-            height = "540",
-            buffer_window =timedelta(seconds = 5),
-            profile = "Auto",
-            label = "SD-1600kbps" # This label is used to modify the file name in the output formats
+            bitrate=1600000,  # Units are in bits per second and not kbps or Mbps - 1.6 Mbps or 1600 kbps
+            width="960",
+            height="540",
+            buffer_window=timedelta(seconds=5),
+            profile="Auto",
+            label="SD-1600kbps" # This label is used to modify the file name in the output formats
           ),
           H264Layer(
-            bitrate = 600000,  # Units are in bits per second and not kbps or Mbps - 0.6 Mbps or 600 kbps
-            width = "640",
-            height = "480",
-            buffer_window =timedelta(seconds = 5),
-            profile = "Auto",
-            label = "SD-600kbps" # This label is used to modify the file name in the output formats
+            bitrate=600000,  # Units are in bits per second and not kbps or Mbps - 0.6 Mbps or 600 kbps
+            width="640",
+            height="480",
+            buffer_window=timedelta(seconds=5),
+            profile="Auto",
+            label="SD-600kbps" # This label is used to modify the file name in the output formats
           )
         ]
       ),
       PngImage(
         # Also generate a set of PNG thumbnails
-        start = "25%",
-        step = "25%",
-        range = "80%",
-        layers = [
+        start="25%",
+        step="25%",
+        range="80%",
+        layers=[
           PngLayer(
-            width = "50%",
-            height = "50%"
+            width="50%",
+            height="50%"
           )
         ]
       )
     ],
     # Specify the format for the output files - one for video+audio, and another for the thumbnails
-    formats = [
+    formats=[
       # MUX the H.264 video and AAC audio into MP4 files, using basename, label, bitrate and extension macros
       # Note that since you have multiple H264Layers defined above, you have to use a macro that produces unique names per H264Layer
       # Either {Label} or {Bitrate} should suffice
-      Mp4Format(filename_pattern = "Video-{Basename}-{Label}-{Bitrate}{Extension}"),
-      PngFormat(filename_pattern = "Thumbnail-{Basename}-{Index}{Extension}")
+      Mp4Format(filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}"),
+      PngFormat(filename_pattern="Thumbnail-{Basename}-{Index}{Extension}")
     ]
   ),
   # What should we do with the job if there is an error?
@@ -207,7 +207,7 @@ transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
   transform_name=transform_name,
-  parameters = myTransform)
+  parameters=myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 
