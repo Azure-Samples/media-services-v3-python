@@ -38,9 +38,10 @@ SUBSCRIPTION_ID = os.getenv('SUBSCRIPTIONID')
 RESOURCE_GROUP = os.getenv('RESOURCEGROUP')
 ACCOUNT_NAME = os.getenv('ACCOUNTNAME')
 
-# The file you want to upload.  For this example, put the file in the same folder as this script. 
+# The file you want to upload.  For this example, the files are placed under Media folder.
 # The file ignite.mp4 has been provided for you. 
 # Also, the Azure_Bumper.mp4 has been provided for you.
+source_file_location = os.chdir("../../Media/")
 source_file = "ignite.mp4"
 bumper_file = "Azure_Bumper.mp4"
 
@@ -222,7 +223,7 @@ jobInputSequence = JobInputSequence(
       end=AbsoluteClipTime(time=timedelta(seconds=12)),
       label="main"
     ),
-    # Post-roll the bumper again just to annoy people even more, as though this was Hulu with ads and their inventory
+    # Post-roll the bumper again
     JobInputAsset(
       asset_name=bumper_asset_name,
       files=[bumper_file],

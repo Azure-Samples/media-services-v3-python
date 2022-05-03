@@ -40,8 +40,9 @@ SUBSCRIPTION_ID = os.getenv('SUBSCRIPTIONID')
 RESOURCE_GROUP = os.getenv('RESOURCEGROUP')
 ACCOUNT_NAME = os.getenv('ACCOUNTNAME')
 
-# The file you want to upload.  For this example, put the file in the same folder as this script. 
+# The file you want to upload.  For this example, the file is placed under Media folder.
 # The file ignite.mp4 has been provided for you. 
+source_file_location = os.chdir("../../Media/")
 source_file = "ignite.mp4"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
@@ -134,9 +135,11 @@ job_name = 'MyEncodingBuiltinCopyCodec'+ uniqueness
 print(f"Creating EncodingBuiltinCopyCodec job {job_name}")
 files = (source_file)
 
+# Create Job Input and Job Output Asset
 input = JobInputAsset(asset_name=in_asset_name)
 outputs = JobOutputAsset(asset_name=out_asset_name)
 
+# Create Job object and then create Transform Job
 theJob = Job(input=input,outputs=[outputs])
 job: Job = client.jobs.create(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name, parameters=theJob)
 
