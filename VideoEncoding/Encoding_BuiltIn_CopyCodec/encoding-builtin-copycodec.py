@@ -9,8 +9,6 @@
 #       which can cause some issues with adaptive switching.
 #       This preset works up to 4K and 60fps content.  
 
-
-#<EncodingImports>
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.media import AzureMediaServices
@@ -30,9 +28,7 @@ import os
 
 #Timer for checking job progress
 import time
-#</EncodingImports>
 
-#<ClientEnvironmentVariables>
 #Get environment variables
 load_dotenv()
 
@@ -57,18 +53,14 @@ in_alternate_id = 'inputALTid' + uniqueness
 in_description = 'inputdescription' + uniqueness
 
 # Create an Asset object
-# From the SDK
-# Asset(*, alternate_id: str = None, description: str = None, container: str = None, storage_account_name: str = None, **kwargs) -> None
 # The asset_id will be used for the container parameter for the storage SDK after the asset is created by the AMS client.
-input_asset = Asset(alternate_id=in_alternate_id,description=in_description)
+input_asset = Asset(alternate_id=in_alternate_id, description=in_description)
 
 # Set the attributes of the output Asset using the random number
 out_asset_name = 'outputassetName' + uniqueness
 out_alternate_id = 'outputALTid' + uniqueness
 out_description = 'outputdescription' + uniqueness
-# From the SDK
-# Asset(*, alternate_id: str = None, description: str = None, container: str = None, storage_account_name: str = None, **kwargs) -> None
-output_asset = Asset(alternate_id=out_alternate_id,description=out_description)
+output_asset = Asset(alternate_id=out_alternate_id, description=out_description)
 
 # The AMS Client
 print("Creating AMS Client")
@@ -76,9 +68,7 @@ client = AzureMediaServices(default_credential, SUBSCRIPTION_ID)
 
 # Create an input Asset
 print(f"Creating input asset {in_asset_name}")
-# From SDK
-# create_or_update(resource_group_name, account_name, asset_name, parameters, custom_headers=None, raw=False, **operation_config)
-inputAsset = client.assets.create_or_update( RESOURCE_GROUP, ACCOUNT_NAME, in_asset_name, input_asset)
+inputAsset = client.assets.create_or_update(RESOURCE_GROUP, ACCOUNT_NAME, in_asset_name, input_asset)
 
 # An AMS asset is a container with a specific id that has "asset-" prepended to the GUID.
 # So, you need to create the asset id to identify it as the container
@@ -87,8 +77,6 @@ in_container = 'asset-' + inputAsset.asset_id
 
 # create an output Asset
 print(f"Creating output asset {out_asset_name}")
-# From SDK
-# create_or_update(resource_group_name, account_name, asset_name, parameters, custom_headers=None, raw=False, **operation_config)
 outputAsset = client.assets.create_or_update(RESOURCE_GROUP, ACCOUNT_NAME, out_asset_name, output_asset)
 
 ### Use the Storage SDK to upload the video ###
@@ -96,9 +84,7 @@ print(f"Uploading the file {source_file}")
 
 blob_service_client = BlobServiceClient.from_connection_string(os.getenv('STORAGEACCOUNTCONNECTION'))
 
-# From SDK
-# get_blob_client(container, blob, snapshot=None)
-blob_client = blob_service_client.get_blob_client(in_container,source_file)
+blob_client = blob_service_client.get_blob_client(in_container, source_file)
 working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
@@ -108,21 +94,14 @@ upload_file_path = os.path.join(working_dir, source_file)
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
-  # From SDK
-  # upload_blob(data, blob_type=<BlobType.BlockBlob: 'BlockBlob'>, length=None, metadata=None, **kwargs)
-    blob_client.upload_blob(data)
+  blob_client.upload_blob(data)
 
-
-#<CreateTransform>
 transform_name = 'CopyCodec'
 
 # Create a new Standard encoding Transform for Built-in Copy Codec
 print(f"Creating Built-in Standard Encoding transform named: {transform_name}")
 
-# From SDK
-# TransformOutput(*, preset, on_error=None, relative_priority=None, **kwargs) -> None
-# For this snippet, we are using 'StandardEncoderPreset'
-
+# For this snippet, we are using 'BuiltInStandardEncoderPreset'
 transform_output = TransformOutput(
   preset = BuiltInStandardEncoderPreset(
       preset_name="saasCopyCodec"   # uses the built in SaaS copy codec preset, which copies source audio and video to MP4 tracks. See notes at top of this file on constraints.
@@ -141,8 +120,8 @@ myTransform.description="Built in preset using the Saas Copy Codec preset. This 
 myTransform.outputs = [transform_output]
 
 print(f"Creating transform {transform_name}")
-# From SDK
-# Create_or_update(resource_group_name, account_name, transform_name, outputs, description=None, custom_headers=None, raw=False, **operation_config)
+
+# Creating the transform
 transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
@@ -150,34 +129,19 @@ transform = client.transforms.create_or_update(
   parameters = myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
-#</CreateTransform>
 
-#<CreateJob>
 job_name = 'MyEncodingBuiltinCopyCodec'+ uniqueness
 print(f"Creating EncodingBuiltinCopyCodec job {job_name}")
 files = (source_file)
 
-# From SDK
-# JobInputAsset(*, asset_name: str, label: str = None, files=None, **kwargs) -> None
 input = JobInputAsset(asset_name=in_asset_name)
-
-# From SDK
-# JobOutputAsset(*, asset_name: str, **kwargs) -> None
 outputs = JobOutputAsset(asset_name=out_asset_name)
 
-# From SDK
-# Job(*, input, outputs, description: str = None, priority=None, correlation_data=None, **kwargs) -> None
 theJob = Job(input=input,outputs=[outputs])
+job: Job = client.jobs.create(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name, parameters=theJob)
 
-# From SDK
-# Create(resource_group_name, account_name, transform_name, job_name, parameters, custom_headers=None, raw=False, **operation_config)
-job: Job = client.jobs.create(RESOURCE_GROUP,ACCOUNT_NAME,transform_name,job_name,parameters=theJob)
-#</CreateJob>
-
-#<CheckJob>
-# From SDK
-# get(resource_group_name, account_name, transform_name, job_name, custom_headers=None, raw=False, **operation_config)
-job_state = client.jobs.get(RESOURCE_GROUP,ACCOUNT_NAME,transform_name,job_name)
+# Check Job State
+job_state = client.jobs.get(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name)
 # First check
 print("First job check")
 print(job_state.state)
@@ -190,7 +154,7 @@ def countdown(t):
         print(timer, end="\r") 
         time.sleep(1) 
         t -= 1
-    job_current = client.jobs.get(RESOURCE_GROUP,ACCOUNT_NAME,transform_name,job_name)
+    job_current = client.jobs.get(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name)
     if(job_current.state == "Finished"):
       print(job_current.state)
       # TODO: Download the output file using blob storage SDK
@@ -205,4 +169,3 @@ def countdown(t):
 
 time_in_seconds = 10
 countdown(int(time_in_seconds))
-#</CheckJob>

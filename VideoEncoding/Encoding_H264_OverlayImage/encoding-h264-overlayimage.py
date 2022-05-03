@@ -1,4 +1,3 @@
-#<EncodingImports>
 from datetime import timedelta
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
@@ -29,9 +28,7 @@ import os
 
 #Timer for checking job progress
 import time
-#</EncodingImports>
 
-#<ClientEnvironmentVariables>
 #Get environment variables
 load_dotenv()
 
@@ -60,10 +57,8 @@ in_alternate_id = 'inputALTid' + uniqueness
 in_description = 'inputdescription' + uniqueness
 
 # Create an Asset object
-# From the SDK
-# Asset(*, alternate_id: str = None, description: str = None, container: str = None, storage_account_name: str = None, **kwargs) -> None
 # The asset_id will be used for the container parameter for the storage SDK after the asset is created by the AMS client.
-input_asset = Asset(alternate_id=in_alternate_id,description=in_description)
+input_asset = Asset(alternate_id=in_alternate_id, description=in_description)
 
 # Create the JobInput for the PNG Image Overlay
 overlay_asset_name = 'overlayassetName' + uniqueness
@@ -71,17 +66,15 @@ overlay_asset_alternate_id = 'inputALTid' + uniqueness
 overlay_asset_description = 'inputdescription' + uniqueness
 
 # Create an Asset object for PNG Image overlay
-# From SDK
-# create_or_update(resource_group_name, account_name, asset_name, parameters, custom_headers=None, raw=False, **operation_config)
 overlay_input_asset = Asset(alternate_id=overlay_asset_alternate_id, description=overlay_asset_description)
 
 # Set the attributes of the output Asset using the random number
 out_asset_name = 'outputassetName' + uniqueness
 out_alternate_id = 'outputALTid' + uniqueness
 out_description = 'outputdescription' + uniqueness
-# From the SDK
-# Asset(*, alternate_id: str = None, description: str = None, container: str = None, storage_account_name: str = None, **kwargs) -> None
-output_asset = Asset(alternate_id=out_alternate_id,description=out_description)
+
+# Create Ouput Asset object
+output_asset = Asset(alternate_id=out_alternate_id, description=out_description)
 
 # The AMS Client
 print("Creating AMS Client")
@@ -89,9 +82,7 @@ client = AzureMediaServices(default_credential, SUBSCRIPTION_ID)
 
 # Create an input Asset
 print(f"Creating input asset {in_asset_name}")
-# From SDK
-# create_or_update(resource_group_name, account_name, asset_name, parameters, custom_headers=None, raw=False, **operation_config)
-inputAsset = client.assets.create_or_update( RESOURCE_GROUP, ACCOUNT_NAME, in_asset_name, input_asset)
+inputAsset = client.assets.create_or_update(RESOURCE_GROUP, ACCOUNT_NAME, in_asset_name, input_asset)
 
 # An AMS asset is a container with a specific id that has "asset-" prepended to the GUID.
 # So, you need to create the asset id to identify it as the container
@@ -100,30 +91,22 @@ in_container = 'asset-' + inputAsset.asset_id
 
 # Create an Overlay input Asset
 print(f"Creating input asset {overlay_asset_name}")
-# From SDK
-# create_or_update(resource_group_name, account_name, asset_name, parameters, custom_headers=None, raw=False, **operation_config)
-overlayAsset = client.assets.create_or_update( RESOURCE_GROUP, ACCOUNT_NAME, overlay_asset_name, overlay_input_asset)
+overlayAsset = client.assets.create_or_update(RESOURCE_GROUP, ACCOUNT_NAME, overlay_asset_name, overlay_input_asset)
 
 # # An AMS asset is a container with a specific id that has "asset-" prepended to the GUID.
 # # So, you need to create the asset id to identify it as the container
 # # where Storage is to upload the video (as a block blob)
 overlay_container = 'asset-' + overlayAsset.asset_id
 
-
 # create an output Asset
 print(f"Creating output asset {out_asset_name}")
-# From SDK
-# create_or_update(resource_group_name, account_name, asset_name, parameters, custom_headers=None, raw=False, **operation_config)
 outputAsset = client.assets.create_or_update(RESOURCE_GROUP, ACCOUNT_NAME, out_asset_name, output_asset)
 
 ### Use the Storage SDK to upload the video ###
 print(f"Uploading the file {source_file}")
 
 blob_service_client = BlobServiceClient.from_connection_string(os.getenv('STORAGEACCOUNTCONNECTION'))
-
-# From SDK
-# get_blob_client(container, blob, snapshot=None)
-blob_client = blob_service_client.get_blob_client(in_container,source_file)
+blob_client = blob_service_client.get_blob_client(in_container, source_file)
 working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
@@ -133,19 +116,13 @@ upload_file_path = os.path.join(working_dir, source_file)
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
-  # From SDK
-  # upload_blob(data, blob_type=<BlobType.BlockBlob: 'BlockBlob'>, length=None, metadata=None, **kwargs)
-    blob_client.upload_blob(data)
-    
-    
+  blob_client.upload_blob(data)
+  
 ### Use the Storage SDK to upload the Overlay file
 print(f"Uploading the file {overlay_file}")
 
 blob_service_client = BlobServiceClient.from_connection_string(os.getenv('STORAGEACCOUNTCONNECTION'))
-
-# From SDK
-# get_blob_client(container, blob, snapshot=None)
-blob_client = blob_service_client.get_blob_client(overlay_container,overlay_file)
+blob_client = blob_service_client.get_blob_client(overlay_container, overlay_file)
 working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, overlay_file)
@@ -155,21 +132,14 @@ upload_file_path = os.path.join(working_dir, overlay_file)
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
-  # From SDK
-  # upload_blob(data, blob_type=<BlobType.BlockBlob: 'BlockBlob'>, length=None, metadata=None, **kwargs)
-    blob_client.upload_blob(data)
+  blob_client.upload_blob(data)
 
-
-#<CreateTransform>
 transform_name = 'H264EncodingOverlayImagePng'
 
 # Create a new BuiltIn Standard encoding Transform for H264 ContentAware Constrained
 print(f"Creating Standard Encoding transform named: {transform_name}")
 
-# From SDK
-# TransformOutput(*, preset, on_error=None, relative_priority=None, **kwargs) -> None
 # For this snippet, we are using 'StandardEncoderPreset' with Overlay Image
-
 transform_output = TransformOutput(
   preset = StandardEncoderPreset(
     codecs=[AacAudio(channels=2, sampling_rate=48000, bitrate=128000, profile=AacAudioProfile.AAC_LC), 
@@ -206,15 +176,12 @@ transform_output = TransformOutput(
 
 print("Creating encoding transform...")
 
-
 # Adding transform details
 myTransform = Transform()
 myTransform.description="A simple custom H264 encoding transform that overlays a PNG image on the video source"
 myTransform.outputs = [transform_output]
 
 print(f"Creating transform {transform_name}")
-# From SDK
-# Create_or_update(resource_group_name, account_name, transform_name, outputs, description=None, custom_headers=None, raw=False, **operation_config)
 transform = client.transforms.create_or_update(
   resource_group_name=RESOURCE_GROUP,
   account_name=ACCOUNT_NAME,
@@ -222,15 +189,12 @@ transform = client.transforms.create_or_update(
   parameters = myTransform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
-#</CreateTransform>
 
-#<CreateJob>
 job_name = 'MyEncodingH264OverlayImagePng'+ uniqueness
 print(f"Creating Encoding264OverlayImagePng job {job_name}")
 files = (source_file, overlay_file)
 
-# From SDK
-# JobInputAsset(*, asset_name: str, label: str = None, files=None, **kwargs) -> None
+# Create Video Input Asset
 jobVideoInputAsset = JobInputAsset(asset_name=in_asset_name)
 
 jobInputOverlay = JobInputAsset(
@@ -244,24 +208,15 @@ job_inputs = [
     jobInputOverlay
 ]
 
-# From SDK
-# JobOutputAsset(*, asset_name: str, **kwargs) -> None
-# outputs = JobOutputAsset(asset_name=out_asset_name)
+# Create Job Output Asset
 outputs = JobOutputAsset(asset_name=out_asset_name)
 
-# From SDK
-# Job(*, input, outputs, description: str = None, priority=None, correlation_data=None, **kwargs) -> None
-theJob = Job(input=JobInputs(inputs=job_inputs),outputs=[outputs], correlation_data={ "propertyname": "string" })
+# Create Job object and then create Trasnform Job
+theJob = Job(input=JobInputs(inputs=job_inputs), outputs=[outputs], correlation_data={ "propertyname": "string" })
+job: Job = client.jobs.create(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name, parameters=theJob)
 
-# From SDK
-# Create(resource_group_name, account_name, transform_name, job_name, parameters, custom_headers=None, raw=False, **operation_config)
-job: Job = client.jobs.create(RESOURCE_GROUP,ACCOUNT_NAME,transform_name,job_name,parameters=theJob)
-#</CreateJob>
-
-#<CheckJob>
-# From SDK
-# get(resource_group_name, account_name, transform_name, job_name, custom_headers=None, raw=False, **operation_config)
-job_state = client.jobs.get(RESOURCE_GROUP,ACCOUNT_NAME,transform_name,job_name)
+# Check Job State
+job_state = client.jobs.get(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name)
 # First check
 print("First job check")
 print(job_state.state)
@@ -274,7 +229,7 @@ def countdown(t):
         print(timer, end="\r") 
         time.sleep(1) 
         t -= 1
-    job_current = client.jobs.get(RESOURCE_GROUP,ACCOUNT_NAME,transform_name,job_name)
+    job_current = client.jobs.get(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name)
     if(job_current.state == "Finished"):
       print(job_current.state)
       # TODO: Download the output file using blob storage SDK
@@ -289,4 +244,3 @@ def countdown(t):
 
 time_in_seconds = 10
 countdown(int(time_in_seconds))
-#</CheckJob>
