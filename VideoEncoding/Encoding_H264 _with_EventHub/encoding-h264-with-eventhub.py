@@ -33,12 +33,13 @@ from azure.mgmt.media.models import (
   JobInputAsset,
   JobOutputAsset,
   OnErrorType,
-  Priority
-  )
+  Priority,
+)
 import os
-
+import random
 #Timer for checking job progress
 import time
+
 
 #Get environment variables
 load_dotenv()
@@ -46,9 +47,8 @@ load_dotenv()
 # Get the default Azure credential from the environment variables AZURE_CLIENT_ID and AZURE_CLIENT_SECRET and AZURE_TENTANT_ID
 default_credential = DefaultAzureCredential()
 
-# The file you want to upload.  For this example, the file is placed under Media folder.
+# The file you want to upload.  For this example, put the file in the same folder as this script. 
 # The file ignite.mp4 has been provided for you. 
-source_file_location = os.chdir("../../Media/")
 source_file = "ignite.mp4"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
@@ -61,39 +61,34 @@ in_description = 'inputdescription' + uniqueness
 
 # Create an Asset object
 # The asset_id will be used for the container parameter for the storage SDK after the asset is created by the AMS client.
-input_asset = Asset(alternate_id=in_alternate_id,description=in_description)
+input_asset = Asset(alternate_id=in_alternate_id, description=in_description)
 
 # Set the attributes of the output Asset using the random number
 out_asset_name = 'outputassetName' + uniqueness
 out_alternate_id = 'outputALTid' + uniqueness
 out_description = 'outputdescription' + uniqueness
 
-# Create an Ouput Asset object
-output_asset = Asset(alternate_id=out_alternate_id,description=out_description)
+# Creating an Ouput Asset object
+output_asset = Asset(alternate_id=out_alternate_id, description=out_description)
 
 SUBSCRIPTION_ID = os.getenv('SUBSCRIPTIONID')
 RESOURCE_GROUP = os.getenv('RESOURCEGROUP')
 ACCOUNT_NAME = os.getenv('ACCOUNTNAME')
 
 # The EventGrid connection information for processing Event Grid subscription events for Media Services
-TOPIC_KEY = os.getenv('EVENTGRID_TOPIC_KEY')
+# TOPIC_KEY = os.getenv('EVENTGRID_TOPIC_KEY')
 ENDPOINT = os.getenv('EVENTGRID_TOPIC_ENDPOINT')
-
-# These were used for Event Hub
-# CONNECTION_STRING = os.getenv('EVENT_HUB_CONN_STR')
-# EVENTHUB_NAME = os.getenv('EVENT_HUB_NAME')
-# CONSUMER_GROUP = os.getenv('CONSUMER_GROUP_NAME')
 
 # The AMS Client
 print("Creating AMS Client")
-client = AzureMediaServices(default_credential,SUBSCRIPTION_ID)
+client = AzureMediaServices(default_credential, SUBSCRIPTION_ID)
 
 # The EventGrid Client
 eventgrid_client = EventGridPublisherClient(endpoint=ENDPOINT, credential=default_credential)
 
 # Create an input Asset
 print(f"Creating input asset {in_asset_name}")
-inputAsset = client.assets.create_or_update( RESOURCE_GROUP, ACCOUNT_NAME, in_asset_name, input_asset)
+inputAsset = client.assets.create_or_update(RESOURCE_GROUP, ACCOUNT_NAME, in_asset_name, input_asset)
 
 # An AMS asset is a container with a specific id that has "asset-" prepended to the GUID.
 # So, you need to create the asset id to identify it as the container
@@ -108,7 +103,7 @@ outputAsset = client.assets.create_or_update(RESOURCE_GROUP, ACCOUNT_NAME, out_a
 print(f"Uploading the file {source_file}")
 
 blob_service_client = BlobServiceClient.from_connection_string(os.getenv('STORAGEACCOUNTCONNECTION'))
-blob_client = blob_service_client.get_blob_client(in_container,source_file)
+blob_client = blob_service_client.get_blob_client(in_container, source_file)
 working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
@@ -120,12 +115,12 @@ upload_file_path = os.path.join(working_dir, source_file)
 with open(upload_file_path, "rb") as data:
   blob_client.upload_blob(data)
 
+
 transform_name = 'H264EncodingwithEventHub'
 
 # Create a new Standard encoding Transform for H264
-print(f"Creating Standard Encoding transform named: {transform_name}")
-
 # For this snippet, we are using 'StandardEncoderPreset'
+print(f"Creating Standard Encoding transform named: {transform_name}")
 transform_output = TransformOutput(
   preset=StandardEncoderPreset(
     codecs=[
@@ -215,7 +210,7 @@ job_name = 'MyEncodingH264WithEventHub'+ uniqueness
 print(f"Creating Encoding264WithEventHub job {job_name}")
 files = (source_file)
 
-# Create Job Input and Job Output Asset
+# Create Job Input and Ouput Asset
 input = JobInputAsset(asset_name=in_asset_name)
 outputs = JobOutputAsset(asset_name=out_asset_name)
 
@@ -223,14 +218,15 @@ outputs = JobOutputAsset(asset_name=out_asset_name)
 theJob = Job(input=input,outputs=[outputs])
 
 # Subscribe to events in the partition
-event = EventGridEvent(subject="MySampleEventGrid", data=[theJob], event_type="Azure.SDK.Demo", data_version="1.0")
+event = EventGridEvent(subject="event1", data={"event-name": "event1"}, event_type="Azure.Sdk.Demo", data_version="1.0")
+eventgrid_client.send(event)
 
-publish_event = eventgrid_client.send(event)
-
-job: Job = client.jobs.create(RESOURCE_GROUP,ACCOUNT_NAME,transform_name,job_name,parameters=theJob)
+# Create a Transform Job
+job: Job = client.jobs.create(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name, parameters=theJob)
+#</CreateJob>
 
 # Check Job State
-job_state = client.jobs.get(RESOURCE_GROUP,ACCOUNT_NAME,transform_name,job_name)
+job_state = client.jobs.get(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name)
 # First check
 print("First job check")
 print(job_state.state)
@@ -243,7 +239,7 @@ def countdown(t):
         print(timer, end="\r") 
         time.sleep(1) 
         t -= 1
-    job_current = client.jobs.get(RESOURCE_GROUP,ACCOUNT_NAME,transform_name,job_name)
+    job_current = client.jobs.get(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name)
     if(job_current.state == "Finished"):
       print(job_current.state)
       # TODO: Download the output file using blob storage SDK
