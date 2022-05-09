@@ -32,9 +32,9 @@ load_dotenv()
 default_credential = DefaultAzureCredential()
 
 # Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-SUBSCRIPTION_ID = os.getenv('SUBSCRIPTIONID')
-RESOURCE_GROUP = os.getenv('RESOURCEGROUP')
-ACCOUNT_NAME = os.getenv('ACCOUNTNAME')
+subscription_id = os.getenv('SUBSCRIPTIONID')
+resource_group = os.getenv('RESOURCEGROUP')
+account_name = os.getenv('ACCOUNTNAME')
 
 # The file you want to upload.  For this example, the file is placed under Media folder.
 # Provide a sample file with 8 discrete audio tracks as layout is defined above.
@@ -51,7 +51,7 @@ in_description = 'inputdescription' + uniqueness
 
 # Create an Asset object
 # The asset_id will be used for the container parameter for the storage SDK after the asset is created by the AMS client.
-input_asset = Asset(alternate_id=in_alternate_id, description=in_description)
+in_asset = Asset(alternate_id=in_alternate_id, description=in_description)
 
 # Set the attributes of the output Asset using the random number
 out_asset_name = 'outputassetName' + uniqueness
@@ -59,24 +59,24 @@ out_alternate_id = 'outputALTid' + uniqueness
 out_description = 'outputdescription' + uniqueness
 
 # Create Output Asset object
-output_asset = Asset(alternate_id=out_alternate_id, description=out_description)
+out_asset = Asset(alternate_id=out_alternate_id, description=out_description)
 
 # The AMS Client
 print("Creating AMS Client")
-client = AzureMediaServices(default_credential, SUBSCRIPTION_ID)
+client = AzureMediaServices(default_credential, subscription_id)
 
 # Create an input Asset
 print(f"Creating input asset {in_asset_name}")
-inputAsset = client.assets.create_or_update(RESOURCE_GROUP, ACCOUNT_NAME, in_asset_name, input_asset)
+input_asset = client.assets.create_or_update(resource_group, account_name, in_asset_name, in_asset)
 
 # An AMS asset is a container with a specific id that has "asset-" prepended to the GUID.
 # So, you need to create the asset id to identify it as the container
 # where Storage is to upload the video (as a block blob)
-in_container = 'asset-' + inputAsset.asset_id
+in_container = 'asset-' + input_asset.asset_id
 
 # create an output Asset
 print(f"Creating output asset {out_asset_name}")
-outputAsset = client.assets.create_or_update(RESOURCE_GROUP, ACCOUNT_NAME, out_asset_name, output_asset)
+output_asset = client.assets.create_or_update(resource_group, account_name, out_asset_name, out_asset)
 
 ### Use the Storage SDK to upload the video ###
 print(f"Uploading the file {source_file}")
@@ -133,8 +133,9 @@ inputDefinitions = [InputFile(filename=source_file, included_tracks=trackList)]
 # Create a new Content Aware Encoding Preset using the Preset Configuration
 transform_output = TransformOutput(
   preset=StandardEncoderPreset(
-    codecs=[AacAudio(channels=2, sampling_rate=48000, bitrate=128000, profile=AacAudioProfile.AAC_LC, label="stereo"),
-            AacAudio(channels=6, sampling_rate=48000, bitrate=320000, profile=AacAudioProfile.AAC_LC, label="surround")
+    codecs=[
+      AacAudio(channels=2, sampling_rate=48000, bitrate=128000, profile=AacAudioProfile.AAC_LC, label="stereo"),
+      AacAudio(channels=6, sampling_rate=48000, bitrate=320000, profile=AacAudioProfile.AAC_LC, label="surround")
     ],
     # Specify the format for the output files - one for AAC audio outputs to MP4
     formats=[
@@ -155,16 +156,16 @@ transform_output = TransformOutput(
 print("Creating encoding transform...")
 
 # Adding transform details
-myTransform = Transform()
-myTransform.description="A custom multi-channel audio encoding preset"
-myTransform.outputs = [transform_output]
+my_transform = Transform()
+my_transform.description="A custom multi-channel audio encoding preset"
+my_transform.outputs = [transform_output]
 
 print(f"Creating transform {transform_name}")
 transform = client.transforms.create_or_update(
-  resource_group_name=RESOURCE_GROUP,
-  account_name=ACCOUNT_NAME,
+  resource_group_name=resource_group,
+  account_name=account_name,
   transform_name=transform_name,
-  parameters=myTransform)
+  parameters=my_transform)
 
 print(f"{transform_name} created (or updated if it existed already). ")
 
@@ -180,11 +181,11 @@ jobInputWithTrackDefinitions = JobInputAsset(asset_name = in_asset_name, input_d
 outputs = JobOutputAsset(asset_name=out_asset_name)
 
 # Create Job object and then create Transform Job
-theJob = Job(input=jobInputWithTrackDefinitions, outputs=[outputs])
-job: Job = client.jobs.create(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name, parameters=theJob)
+the_job = Job(input=jobInputWithTrackDefinitions, outputs=[outputs])
+job: Job = client.jobs.create(resource_group, account_name, transform_name, job_name, parameters=the_job)
 
 # Check Job State
-job_state = client.jobs.get(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name)
+job_state = client.jobs.get(resource_group, account_name, transform_name, job_name)
 # First check
 print("First job check")
 print(job_state.state)
@@ -197,7 +198,7 @@ def countdown(t):
         print(timer, end="\r") 
         time.sleep(1) 
         t -= 1
-    job_current = client.jobs.get(RESOURCE_GROUP, ACCOUNT_NAME, transform_name, job_name)
+    job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
     if(job_current.state == "Finished"):
       print(job_current.state)
       # TODO: Download the output file using blob storage SDK
