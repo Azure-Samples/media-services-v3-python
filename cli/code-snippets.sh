@@ -307,10 +307,10 @@ az ams content-key-policy option update --policy-option-id <policyOptionId>
 az ams job start --output-assets <outputAssets>
 # </AmsJobStart>
 
+#type: command
+#short-summary: Update an existing job.
 # <AmsJobUpdate>
 az ams job update -g <resourceGroupName> -a <amsAccountName> --t <transformName>  -n <jobName>
-    #type: command
-    #short-summary: Update an existing job.
 # </AmsJobUpdate>
 
 #type: command
@@ -344,6 +344,12 @@ az ams streaming-locator create -g <resourceGroupName> -a <amsAccountName> -n <s
 # </AmsStreamingLocatorCreate>
 
 #type: command
+#short-summary: Delete a streaming locator
+# <AmsStreamingLocatorDelete>
+az ams streaming-locator delete -g <resourceGroupName> -a <amsAccountName>
+# </AmsStreamingLocatorDelete>
+
+#type: command
 #short-summary: List all the streaming locators within an Azure Media Services account.
 # <AmsStreamingLocatorList>
 az ams streaming-locator list -g <resourceGroupName> -a <amsAccountName>
@@ -372,6 +378,12 @@ az ams streaming-locator list-content-keys -g <resourceGroupName> -a <amsAccount
 # <AmsStreamingPolicyCreate>
 az ams streaming-policy create -g <resourceGroupName> -a <amsAccountName> -n <streamingPolicyName>
 # </AmsStreamingPolicyCreate>
+
+#type: command
+#short-summary: Delete a streaming policy.
+# <AmsStreamingPolicyDelete>
+az ams streaming-policy delete -g <resourceGroupName> -a <amsAccountName> -n <streamingPolicyName>
+# </AmsStreamingPolicyDelete>
 
 #type: command
 #short-summary: List all the streaming policies within an Azure Media Services account.
@@ -443,7 +455,7 @@ az ams streaming-endpoint akamai remove --identifier <identifier>
 #short-summary: Set the scale of a streaming endpoint.
 # <AmsStreamingEndpointScale>
 az ams streaming-endpoint scale --scale-units <x>
-# <AmsStreamingEndpointScale>
+# </AmsStreamingEndpointScale>
 
 #type: command
 #short-summary: Update the details of a streaming endpoint.
@@ -500,23 +512,25 @@ az ams live-event reset -g <resourceGroupName> -a <amsAccountName>
 # </AmsLiveEventReset>
 
 #type: command
-    #short-summary: Update the details of a live event.
-    #examples:
-        #- name: Set a new allowed IP address and remove an existing IP address at index '0'.
-          #text: >
-            #az ams live-event update -a amsAccount -g resourceGroup -n liveEventName --remove input.accessControl.ip.allow 0 --add input.accessControl.ip.allow 1.2.3.4/22
-        #- name: Clear existing IP addresses and set new ones.
-          #text: >
-            #az ams live-event update -a amsAccount -g resourceGroup -n liveEventName --ips 1.2.3.4/22 5.6.7.8/30
+#short-summary: Update the details of a live event.
+#examples:
+#- name: Set a new allowed IP address and remove an existing IP address at index '0'.
+#text: >
+#az ams live-event update -a amsAccount -g resourceGroup -n liveEventName --remove input.accessControl.ip.allow 0 --add input.accessControl.ip.allow 1.2.3.4/22
+#- name: Clear existing IP addresses and set new ones.
+#text: >
+#az ams live-event update -a amsAccount -g resourceGroup -n liveEventName --ips 1.2.3.4/22 5.6.7.8/30
+
 # <AmsLiveEventUpdate>
 az ams live-event update -g <resourceGroupName> -a <amsAccountName> -n <liveEventName>
-# <AmsLiveEventUpdate>
+# </AmsLiveEventUpdate>
 
-    #type: command
-    #short-summary: Place the CLI in a waiting state until a condition of the live event is met.
-    #examples:
-        #- name: Place the CLI in a waiting state until the live event is created.
-          #text: az ams live-event wait -g MyResourceGroup -a <amsAccountName> -n MyLiveEvent --created
+#type: command
+#short-summary: Place the CLI in a waiting state until a condition of the live event is met.
+#examples:
+#- name: Place the CLI in a waiting state until the live event is created.
+#text: az ams live-event wait -g MyResourceGroup -a <amsAccountName> -n MyLiveEvent --created
+
 # <AmsLiveEventWait>
 az ams live-event wait -g <resourceGroupName> -a <amsAccountName> -n <liveEventName>
 # </AmsLiveEventWait>
@@ -534,27 +548,27 @@ az ams live-output show -g <resourceGroupName> -a <amsAccountName> --live-event-
 # </AmsLiveEOutputShow>
 
 #type: command
-    #short-summary: List all the live outputs in a live event.
+#short-summary: List all the live outputs in a live event.
 # <AmsLiveOutputList>
 az ams live-output list -g <resourceGroupName> -a <amsAccountName> --live-event-name <liveEventName>
 # </AmsLiveOutputList>
 
+#type: command
+#short-summary: Delete a live output.
 # <AmsLiveOutputDelete>
 az ams live-output delete -g <resourceGroupName> -a <amsAccountName> --live-event-name <liveEventName> -n <liveEventOutputName>
-    #type: command
-    #short-summary: Delete a live output.
 # </AmsLiveOutputDelete>
 
+#type: command
+#short-summary: Show the details of an account filter.
 # <AmsAccountFilterShow>
 az ams account-filter show  -g <resourceGroupName> -a <amsAccountName> -n <accountFilterName>
-    #type: command
-    #short-summary: Show the details of an account filter.
 # </AmsAccountFilterShow>
 
+#type: command
+#short-summary: List all the account filters of an Azure Media Services account.
 # <AmsAccountFilterList>
 az ams account-filter list -g <resourceGroupName> -a <amsAccountName>
-    #type: command
-    #short-summary: List all the account filters of an Azure Media Services account.
 # </AmsAccountFilterList>
 
 #type: command
@@ -567,14 +581,14 @@ az ams account-filter list -g <resourceGroupName> -a <amsAccountName>
 az ams account-filter create -a <amsAccountName> -g <resourceGroupName> -n <myFilter>
 # </AmsAccountFilterCreate>
 
+#type: command
+#short-summary: Update the details of an account filter.
 # <AmsAccountFilterUpdate>
 az ams account-filter update -g <resourceGroupName> -a <amsAccountName> -n <accountFilterName>
-    #type: command
-    #short-summary: Update the details of an account filter.
 # </AmsAccountFilterUpdate>
 
+#type: command
+#short-summary: Delete an account filter.
 # <AmsAccountFilterDelete>
 az ams account-filter delete -g <resourceGroupName> -a <amsAccountName> -n <accountFilterName>
-    #type: command
-    #short-summary: Delete an account filter.
 # </AmsAccountFilterDelete>
