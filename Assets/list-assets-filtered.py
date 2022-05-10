@@ -17,18 +17,16 @@ load_dotenv()
 default_credential = DefaultAzureCredential()
 
 # Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP, STORAGEACCOUNTNAME, AZURE_CLIENT_ID and AZURE_CLIENT_SECRET
-SUBSCRIPTION_ID = os.getenv('SUBSCRIPTIONID')
-RESOURCE_GROUP = os.getenv('RESOURCEGROUP')
-ACCOUNT_NAME = os.getenv('ACCOUNTNAME')
-CLIENT_ID = os.getenv('AZURE_CLIENT_ID')
-CLIENT_SECRET = os.getenv('AZURE_CLIENT_SECRET')
+subscription_id = os.getenv('SUBSCRIPTIONID')
+resource_group = os.getenv('RESOURCEGROUP')
+account_name = os.getenv('ACCOUNTNAME')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
 
 # The AMS Client
 print("Creating AMS Client")
-client = AzureMediaServices(default_credential, SUBSCRIPTION_ID)
+client = AzureMediaServices(default_credential, subscription_id)
 
 # List the Assets in Account
 print("Listing assets in account:")
@@ -38,5 +36,5 @@ print("Listing assets in account:")
 filter_odata = "properties/alternateId eq 'MyCustomIdentifier'"
 order_by = "properties/created desc"
 
-for asset in client.assets.list(resource_group_name=RESOURCE_GROUP, account_name=ACCOUNT_NAME, filter=filter_odata, orderby=order_by):
+for asset in client.assets.list(resource_group_name=resource_group, account_name=account_name, filter=filter_odata, orderby=order_by):
   print(asset.alternate_id)
