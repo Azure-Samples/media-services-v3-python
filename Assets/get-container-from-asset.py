@@ -1,16 +1,13 @@
 # This sample demonstrates ho wto get the container name from any Asset. It can be in input or output asset from an encoding job.
 # Not that this sample also demonstrates how to name the container on creation.
 
-#<Imports>
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.media import AzureMediaServices
 from azure.mgmt.media.models import (Asset)
 import os
 import random
-#</Imports>
 
-#<ClientEnvironmentVariables>
 #Get environment variables
 load_dotenv()
 
