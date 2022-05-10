@@ -1,4 +1,4 @@
-# This sample demonstrates ho wto get the container name from any Asset. It can be in input or output asset from an encoding job.
+# This sample demonstrates how to get the container name from any Asset. It can be in input or output asset from an encoding job.
 # Not that this sample also demonstrates how to name the container on creation.
 
 from dotenv import load_dotenv
