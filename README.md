@@ -5,14 +5,6 @@ Use this set of samples to get started with Azure Media Service v3 and Python.
 **NOTE**
 Owned and maintained by Microsoft. Please do not push changes directly to this repo.  Please fork the repo and set it as upstream and your own fork as origin. See the CONTRIBUTING.md file for more details.
 
-## Samples
-
-| Sample | Description |
-|--------|-------------|
-|[Basic encoding](/BasicEncoding/)| Basic example for uploading a local file or encoding from a source URL. Sample shows how to use storage SDK to download content, and shows how to stream to a player |
-|[Encoding with Overlay](/EncodingWithOverlay/)| Example for adding Overlay image (watermark) to a video. Sample shows how to encode a local video file adding local overlay image to it using custom transform  |
-|[Face Redaction using events and functions](/FaceRedactorEventBased/)| This is an example of an event-based approach that triggers an Azure Media Services Face Redactor job on a video as soon as it lands on an Azure Storage Account. It leverages Azure Media Services, Azure Function, Event Grid and Azure Storage for the solution. For the full description of the solution, see the [README.md](https://github.com/Azure-Samples/media-services-v3-python/blob/main/VideoAnalytics/FaceRedactorEventBased/README.md)|
-
 ## Getting Started
 
 ### Prerequisites
