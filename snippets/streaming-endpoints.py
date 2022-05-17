@@ -25,7 +25,7 @@ storage_account_name=os.getenv("STORAGEACCOUNTNAME")
 default_credential = DefaultAzureCredential()
 client = AzureMediaServices(default_credential, subscription_id)
 
-# Get the media services account object for information on the current location.
+# Get the media services account.
 media_account = client.mediaservices.get(resource_group_name, account_name)
 #</CreateAMSClient>
 
@@ -50,7 +50,6 @@ begin_create_streaming_endpoint(resource_group_name, account_name, streaming_end
 
 #<BeginScaleStreamingEndpoint>
 # Set the streaming scale unit for the streaming endpoint.
-# You can set this number to any units. Max scale unit is 10.
 streaming_entity_scale_unit = StreamingEntityScaleUnit(scale_unit=2)
 # From SDK:
 # begin_scale(resource_group_name: str, account_name: str, streaming_endpoint_name: str, parameters: azure.mgmt.media.models._models_py3.StreamingEntityScaleUnit, **kwargs: Any) -> azure.core.polling._poller.LROPoller[None]
@@ -80,7 +79,7 @@ begin_stop_streaming_endpoint(resource_group_name, account_name, streaming_endpo
 
 #<BeginUpdateStreamingEndpoint>
 # Set the properties that you want to update for the streaming endpoint.
-# For the sample, we will be updating the CDN profile to Premium Verizon
+# In this example, you are updating the CDN profile to Premium Verizon.
 streaming_endpoint = StreamingEndpoint(
     location=media_account.location,
     cdn_profile="AzureMediaStreamingPlatformCdnProfile-PremiumVerizon",
