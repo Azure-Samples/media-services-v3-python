@@ -32,7 +32,7 @@ client = AzureMediaServices(default_credential, subscription_id)
 
 #<CreateAccountFilter>
 # Set the name of the Account filter you want to create
-filter_name = "sanjaystestaccountfiltername"
+filter_name = "myaccountfiltername"
 
 # Set the properties that you want to set for the account filter
 # For this sample, we want to add the first quality bitrate for the account filter.
@@ -51,7 +51,7 @@ create_account_filter(resource_group_name, account_name, filter_name, account_fi
 # get(resource_group_name: str, account_name: str, filter_name: str, **kwargs: Any) -> azure.mgmt.media.models._models_py3.AccountFilter
 def get_account_filter(resource_group_name, account_name, filter_name):
     results = client.account_filters.get(resource_group_name, account_name, filter_name)
-    # You can get any properties of account filter. Here, we are printing the account filter name.
+    # Printing the account filter name.
     print(results.name)
 get_account_filter(resource_group_name, account_name, filter_name)
 #</GetAccountFilter>
@@ -63,14 +63,15 @@ def list_account_filter(resource_group_name, account_name):
     results = client.account_filters.list(resource_group_name, account_name)
     # For this sample, we are printing the list of all account filters in the current Media Services Account
     for filter in results:
+        #For each of the filters, print its name.
         print(filter.name) 
 
 list_account_filter(resource_group_name, account_name)
 #</ListAccountFilter>
 
 #<UpdateAccountFilter>
-# Set the properties that you want to update to the account filter
-# For this sample, we want to update the first quality bitrate for the account filter.
+# Update the properties of the account filter.
+# For this sample, you are updating the first quality bitrate for the account filter.
 first_quality = FirstQuality(bitrate=28000)
 account_filter = AccountFilter(first_quality=first_quality)
 
@@ -98,8 +99,8 @@ filter_name = "myassetfiltername"
 # For this sample, we are using an existing asset to add the asset filter. If one doesn't already exist, create a new asset.
 asset_name = "myoutputasset"
 
-# Set the properties that you want to set for the asset filter
-# For this sample, we want to add the first quality bitrate for the asset filter.
+# Set the properties of the asset filter
+# For this sample, you are setting the first quality bitrate for the asset filter.
 first_quality = FirstQuality(bitrate=128000)
 asset_filter = AssetFilter(first_quality=first_quality)
 
@@ -133,8 +134,8 @@ list_asset_filter(resource_group_name, account_name, asset_name)
 #</ListAssetFilter>
 
 #<UpdateAssetFilter>
-# Set the properties that you want to update to the asset filter
-# For this sample, we want to update first quality bitrate for the asset filter.
+# Update the properites of the asset filter
+# For this sample, you are updating the first quality bitrate for the asset filter.
 first_quality = FirstQuality(bitrate=28000)
 asset_filter = AssetFilter(first_quality=first_quality)
 
