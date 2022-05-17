@@ -62,8 +62,8 @@ get_account_filter(resource_group_name, account_name, filter_name)
 def list_account_filter(resource_group_name, account_name):
     results = client.account_filters.list(resource_group_name, account_name)
     # For this sample, we are printing the list of all account filters in the current Media Services Account
-    for i in results:
-        print(i.name) 
+    for filter in results:
+        print(filter.name) 
 
 list_account_filter(resource_group_name, account_name)
 #</ListAccountFilter>
@@ -126,8 +126,8 @@ get_asset_filter(resource_group_name, account_name, asset_name, filter_name)
 # list(resource_group_name: str, account_name: str, asset_name: str, **kwargs: Any) -> Iterable[azure.mgmt.media.models._models_py3.AssetFilterCollection]
 def list_asset_filter(resource_group_name, account_name, asset_name):
     results = client.asset_filters.list(resource_group_name, account_name, asset_name)
-    for i in results:
-        print(i.name)
+    for filter in results:
+        print(filter.name)
         
 list_asset_filter(resource_group_name, account_name, asset_name)
 #</ListAssetFilter>
