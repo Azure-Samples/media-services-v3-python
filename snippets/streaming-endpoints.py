@@ -30,8 +30,8 @@ media_account = client.mediaservices.get(resource_group_name, account_name)
 #</CreateAMSClient>
 
 #<BeginCreateStreamingEndpoint>
-# Set the name of the Streaming Endpoint you want to create
-streaming_endpoint_name = "sanjaysteststreamingendp"
+# Set the name of the Streaming Endpoint you want to create.
+streaming_endpoint_name = "mystreamingendpoint"
 
 # Set the properties required for streaming endpoint
 streaming_endpoint = StreamingEndpoint(
@@ -79,7 +79,7 @@ begin_stop_streaming_endpoint(resource_group_name, account_name, streaming_endpo
 #</BeginStopStreamingEndpoint>
 
 #<BeginUpdateStreamingEndpoint>
-# Set the properties that you wish to update for the streaming endpoint.
+# Set the properties that you want to update for the streaming endpoint.
 # For the sample, we will be updating the CDN profile to Premium Verizon
 streaming_endpoint = StreamingEndpoint(
     location=media_account.location,
