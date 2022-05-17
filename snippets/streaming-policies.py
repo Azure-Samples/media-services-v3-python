@@ -28,7 +28,7 @@ client = AzureMediaServices(default_credential, subscription_id)
 
 #<CreateStreamingPolicy>
 # Set the name of the Streaming Policy you want to create
-streaming_policy_name = "sanjaysteststreamingpolicy"
+streaming_policy_name = "mystreamingpolicy"
 
 # Set the properties of the streaming policy
 # For the sample, you are using default content key policy name and envelope encryption properties.
