@@ -85,7 +85,7 @@ def list_streaming_locator_paths(resource_group_name, account_name, streaming_lo
     print(results.streaming_paths)
     
 list_streaming_locator_paths(resource_group_name, account_name, streaming_locator_name)
-#<ListStreamingLocatorPaths>
+#</ListStreamingLocatorPaths>
 
 #<DeleteStreamingLocator>
 # From SDK:
