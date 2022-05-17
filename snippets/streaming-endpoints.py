@@ -98,8 +98,8 @@ begin_update_streaming_endpoint(resource_group_name, account_name, streaming_end
 # get(resource_group_name: str, account_name: str, streaming_endpoint_name: str, **kwargs: Any) -> azure.mgmt.media.models._models_py3.StreamingEndpoint
 def get_streaming_endpoint(resource_group_name, account_name, streaming_endpoint_name):
     results = client.streaming_endpoints.get(resource_group_name, account_name, streaming_endpoint_name)
-    # You can get any properties of a streaming endpoint. Here, we are printing the streaming endpoint object.
-    print(results)
+    # Show the name of the streaming endpoint.
+    print(results.name)
     
 get_streaming_endpoint(resource_group_name, account_name, streaming_endpoint_name)
 #</GetStreamingEndpoint>
@@ -109,7 +109,7 @@ get_streaming_endpoint(resource_group_name, account_name, streaming_endpoint_nam
 # list(resource_group_name: str, account_name: str, **kwargs: Any) -> Iterable[azure.mgmt.media.models._models_py3.StreamingEndpointListResult]
 def list_streaming_endpoint(resource_group_name, account_name):
     results = client.streaming_endpoints.list(resource_group_name, account_name)
-    # Here, we are printing the entire Streaming Endpoints in the current Media Services Account
+    # List all of the streaming endpoints in the current Media Services Account
     for endpoints in results:
         print(endpoints.name)
         
