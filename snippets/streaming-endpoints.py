@@ -31,7 +31,7 @@ media_account = client.mediaservices.get(resource_group_name, account_name)
 
 #<BeginCreateStreamingEndpoint>
 # Set the name of the Streaming Endpoint you want to create
-streaming_endpoint_name = "sanjaysteststreamingendp"
+streaming_endpoint_name = "mystreamingendpoint"
 
 # Set the properties required for streaming endpoint
 streaming_endpoint = StreamingEndpoint(
@@ -49,8 +49,7 @@ begin_create_streaming_endpoint(resource_group_name, account_name, streaming_end
 #</BeginCreateStreamingEndpoint>
 
 #<BeginScaleStreamingEndpoint>
-# Set the streaming scale unit for the streaming endpoint.
-# You can set this number to any units. Max scale unit is 10.
+# Set the number of streaming scale units for the streaming endpoint.
 streaming_entity_scale_unit = StreamingEntityScaleUnit(scale_unit=2)
 # From SDK:
 # begin_scale(resource_group_name: str, account_name: str, streaming_endpoint_name: str, parameters: azure.mgmt.media.models._models_py3.StreamingEntityScaleUnit, **kwargs: Any) -> azure.core.polling._poller.LROPoller[None]
@@ -79,8 +78,8 @@ begin_stop_streaming_endpoint(resource_group_name, account_name, streaming_endpo
 #</BeginStopStreamingEndpoint>
 
 #<BeginUpdateStreamingEndpoint>
-# Set the properties that you wish to update for the streaming endpoint.
-# For the sample, we will be updating the CDN profile to Premium Verizon
+# Update the properties of a streaming endpoint.
+# For this sample, you are updating the CDN profile to Premium Verizon
 streaming_endpoint = StreamingEndpoint(
     location=media_account.location,
     cdn_profile="AzureMediaStreamingPlatformCdnProfile-PremiumVerizon",
@@ -110,9 +109,9 @@ get_streaming_endpoint(resource_group_name, account_name, streaming_endpoint_nam
 # list(resource_group_name: str, account_name: str, **kwargs: Any) -> Iterable[azure.mgmt.media.models._models_py3.StreamingEndpointListResult]
 def list_streaming_endpoint(resource_group_name, account_name):
     results = client.streaming_endpoints.list(resource_group_name, account_name)
-    # Here, we are printing the entire Streaming Endpoints in the current Media Services Account
-    for endpoints in results:
-        print(endpoints.name)
+    # Print the names of the streaming endpoints.
+    for endpoint in results:
+        print(endpoint.name)
         
 list_streaming_endpoint(resource_group_name, account_name)
 #</ListStreamingEndpoint>
@@ -122,6 +121,7 @@ list_streaming_endpoint(resource_group_name, account_name)
 # skus(resource_group_name: str, account_name: str, streaming_endpoint_name: str, **kwargs: Any) -> azure.mgmt.media.models._models_py3.StreamingEndpointSkuInfoListResult
 def list_skus_streaming_endpoint(resource_group_name, account_name, streaming_endpoint_name):
     results = client.streaming_endpoints.skus(resource_group_name, account_name, streaming_endpoint_name)
+    # Print the SKUs
     print(results.value)
     
 list_skus_streaming_endpoint(resource_group_name, account_name, streaming_endpoint_name)
