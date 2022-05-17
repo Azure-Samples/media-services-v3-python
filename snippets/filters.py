@@ -93,10 +93,10 @@ delete_account_filter(resource_group_name, account_name, filter_name)
 
 #<CreateAssetFilter>
 # Set the name of the Asset filter you want to create
-filter_name = "sanjaystestassetfiltername"
+filter_name = "myassetfiltername"
 
-# For this sample, we are using an existing asset to add the asset filter. You could also create a new asset if you'd like.
-asset_name = "outputassetNamemySampleRandomID"
+# For this sample, we are using an existing asset to add the asset filter. If one doesn't already exist, create a new asset.
+asset_name = "myoutputasset"
 
 # Set the properties that you want to set for the asset filter
 # For this sample, we want to add the first quality bitrate for the asset filter.
@@ -134,7 +134,7 @@ list_asset_filter(resource_group_name, account_name, asset_name)
 
 #<UpdateAssetFilter>
 # Set the properties that you want to update to the asset filter
-# For this sample, we want to update the first quality bitrate for the asset filter.
+# For this sample, we want to update first quality bitrate for the asset filter.
 first_quality = FirstQuality(bitrate=28000)
 asset_filter = AssetFilter(first_quality=first_quality)
 
