@@ -31,9 +31,11 @@ client = AzureMediaServices(default_credential, subscription_id)
 # create(resource_group_name: str, account_name: str, streaming_locator_name: str, parameters: _models_py3.StreamingLocator, **kwargs: Any) -> _models_py3.StreamingLocator
 streaming_locator_name = "mystreaminglocator"
 
-# Specify the name of the asset and the Streaming Policy you created or use one of the predefined streaming policies.
-# For the purpose of this sample, you will use existing asset named "outputassetNamemySampleRandomID" and "Predefined_ClearStreamingOnly"
-# If these resources don't exist yet, create them before attempting this sample.
+
+# Specify the name of the asset and the streaming policy you created or use one of the predefined streaming policies.
+# For the purpose of this sample, you will use an existing asset named "outputassetNamemySampleRandomID" and "Predefined_ClearStreamingOnly"
+# If you haven't created the asset and streaming policy, create them and use their names/identifiers with this code.
+
 # The predefined Streaming Policies available are: 'Predefined_DownloadOnly', 'Predefined_ClearStreamingOnly', 
 # 'Predefined_DownloadAndClearStreaming', 'Predefined_ClearKey', 'Predefined_MultiDrmCencStreaming' and 'Predefined_MultiDrmStreaming'.
 streaming_locator = StreamingLocator(asset_name="outputassetNamemySampleRandomID", streaming_policy_name="Predefined_ClearStreamingOnly")
@@ -59,6 +61,7 @@ get_streaming_locator(resource_group_name, account_name, streaming_locator_name)
 # list(resource_group_name: str, account_name: str, filter: Optional[str] = None, top: Optional[int] = None, orderby: Optional[str] = None, **kwargs: Any) -> Iterable[_models_py3.StreamingLocatorCollection]
 def list_streaming_locator(resource_group_name, account_name):
     results = client.streaming_locators.list(resource_group_name, account_name)
+    
     # List the streaming locators in the Media Services account.
     for locator in results:
         print(locator.name)
@@ -82,7 +85,7 @@ list_streaming_locator_content_keys(resource_group_name, account_name, streaming
 # list_paths(resource_group_name: str, account_name: str, streaming_locator_name: str, **kwargs: Any) -> _models_py3.ListPathsResponse
 def list_streaming_locator_paths(resource_group_name, account_name, streaming_locator_name):
     results = client.streaming_locators.list_paths(resource_group_name, account_name, streaming_locator_name)
-    # Print the paths
+    # List the streaming locator paths
     print(results.streaming_paths)
     
 list_streaming_locator_paths(resource_group_name, account_name, streaming_locator_name)
