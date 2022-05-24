@@ -34,12 +34,12 @@ streaming_locator_name = "mystreaminglocator"
 # Specify the name of the asset and the Streaming Policy you created or use one of the predefined streaming policies.
 # For the purpose of this sample, you will use existing asset named "outputassetNamemySampleRandomID" and "Predefined_ClearStreamingOnly"
 # If these resources don't exist yet, create them before attempting this sample.
-# The predefined Streaming Policies available are: 'Predefined_DownloadOnly', 'Predefined_ClearStreamingOnly', 
+# The predefined Streaming Policies available are: 'Predefined_DownloadOnly', 'Predefined_ClearStreamingOnly',
 # 'Predefined_DownloadAndClearStreaming', 'Predefined_ClearKey', 'Predefined_MultiDrmCencStreaming' and 'Predefined_MultiDrmStreaming'.
 streaming_locator = StreamingLocator(asset_name="outputassetNamemySampleRandomID", streaming_policy_name="Predefined_ClearStreamingOnly")
 def create_streaming_locator(resource_group_name, account_name, streaming_locator_name, parameters):
     streaming_locator = client.streaming_locators.create(resource_group_name, account_name, streaming_locator_name, parameters)
-    
+
 create_streaming_locator(resource_group_name, account_name, streaming_locator_name, streaming_locator)
 #</CreateStreamingLocator>
 
@@ -62,7 +62,7 @@ def list_streaming_locator(resource_group_name, account_name):
     # List the streaming locators in the Media Services account.
     for locator in results:
         print(locator.name)
-        
+
 list_streaming_locator(resource_group_name, account_name)
 #</ListStreamingLocator>
 
@@ -73,7 +73,7 @@ def list_streaming_locator_content_keys(resource_group_name, account_name, strea
     results = client.streaming_locators.list_content_keys(resource_group_name, account_name, streaming_locator_name)
     # Print the content keys.
     print(results.content_keys)
-    
+
 list_streaming_locator_content_keys(resource_group_name, account_name, streaming_locator_name)
 #</ListStreamingLocatorContentKeys>
 
@@ -84,7 +84,7 @@ def list_streaming_locator_paths(resource_group_name, account_name, streaming_lo
     results = client.streaming_locators.list_paths(resource_group_name, account_name, streaming_locator_name)
     # Print the paths
     print(results.streaming_paths)
-    
+
 list_streaming_locator_paths(resource_group_name, account_name, streaming_locator_name)
 #</ListStreamingLocatorPaths>
 
@@ -93,6 +93,6 @@ list_streaming_locator_paths(resource_group_name, account_name, streaming_locato
 # delete(resource_group_name: str, account_name: str, streaming_locator_name: str, **kwargs: Any) -> None
 def delete_streaming_locator(resource_group_name, account_name, streaming_locator_name):
     client.streaming_locators.delete(resource_group_name, account_name, streaming_locator_name)
-    
+
 delete_streaming_locator(resource_group_name, account_name, streaming_locator_name)
 #</DeleteStreamingLocator>
