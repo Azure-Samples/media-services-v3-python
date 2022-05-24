@@ -30,6 +30,7 @@ media_account = client.mediaservices.get(resource_group_name, account_name)
 #</CreateAMSClient>
 
 #<BeginCreateStreamingEndpoint>
+
 # Set the name of the Streaming Endpoint you want to create.
 streaming_endpoint_name = "mystreamingendpoint"
 
@@ -49,7 +50,8 @@ begin_create_streaming_endpoint(resource_group_name, account_name, streaming_end
 #</BeginCreateStreamingEndpoint>
 
 #<BeginScaleStreamingEndpoint>
-# Set the streaming scale unit for the streaming endpoint.
+
+# Set the number of streaming scale units for the streaming endpoint.
 streaming_entity_scale_unit = StreamingEntityScaleUnit(scale_unit=2)
 # From SDK:
 # begin_scale(resource_group_name: str, account_name: str, streaming_endpoint_name: str, parameters: azure.mgmt.media.models._models_py3.StreamingEntityScaleUnit, **kwargs: Any) -> azure.core.polling._poller.LROPoller[None]
@@ -78,8 +80,9 @@ begin_stop_streaming_endpoint(resource_group_name, account_name, streaming_endpo
 #</BeginStopStreamingEndpoint>
 
 #<BeginUpdateStreamingEndpoint>
-# Set the properties that you want to update for the streaming endpoint.
-# In this example, you are updating the CDN profile to Premium Verizon.
+
+# Update the properties of a streaming endpoint.
+# For this sample, you are updating the CDN profile to Premium Verizon
 streaming_endpoint = StreamingEndpoint(
     location=media_account.location,
     cdn_profile="AzureMediaStreamingPlatformCdnProfile-PremiumVerizon",
@@ -121,6 +124,7 @@ list_streaming_endpoint(resource_group_name, account_name)
 # skus(resource_group_name: str, account_name: str, streaming_endpoint_name: str, **kwargs: Any) -> azure.mgmt.media.models._models_py3.StreamingEndpointSkuInfoListResult
 def list_skus_streaming_endpoint(resource_group_name, account_name, streaming_endpoint_name):
     results = client.streaming_endpoints.skus(resource_group_name, account_name, streaming_endpoint_name)
+    # Print the SKUs
     print(results.value)
     
 list_skus_streaming_endpoint(resource_group_name, account_name, streaming_endpoint_name)

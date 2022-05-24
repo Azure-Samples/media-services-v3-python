@@ -28,12 +28,11 @@ client = AzureMediaServices(default_credential, subscription_id)
 
 #<CreateStreamingPolicy>
 # Set the name of the Streaming Policy you want to create
-streaming_policy_name = "sanjaysteststreamingpolicy"
+streaming_policy_name = "mystreamingpolicy"
 
-# Set the properties you want to use for the streaming policy
-# For the sample, we are only using default content key policy name and envelope encryption properties.
-# You may add/change as you wish for your streaming policy.
-default_content_key_policy_name = "sanjaystestcontentkeypolicy"
+# Set the properties of the streaming policy
+# For the sample, you are using default content key policy name and envelope encryption properties.
+default_content_key_policy_name = "mycontentkeypolicy"
 enabled_protocols = EnabledProtocols(
     download=False,
     dash=True,
@@ -66,7 +65,7 @@ delete_streaming_policy(resource_group_name, account_name, streaming_policy_name
 # get(resource_group_name: str, account_name: str, streaming_policy_name: str, **kwargs: Any) -> _models_py3.StreamingPolicy
 def get_streaming_policy(resource_group_name, account_name, streaming_policy_name):
     results = client.streaming_policies.get(resource_group_name, account_name, streaming_policy_name)
-    # You can get any properties of a streaming policy. Here, we are printing the streaming policy name.
+    # Print the streaming policy name.
     print(results.name)
     
 get_streaming_policy(resource_group_name, account_name, streaming_policy_name)
@@ -77,9 +76,9 @@ get_streaming_policy(resource_group_name, account_name, streaming_policy_name)
 # list(resource_group_name: str, account_name: str, filter: Optional[str] = None, top: Optional[int] = None, orderby: Optional[str] = None, **kwargs: Any) -> Iterable[_models_py3.StreamingPolicyCollection]
 def list_streaming_policy(resource_group_name, account_name):
     results = client.streaming_policies.list(resource_group_name, account_name)
-    # You can add additional functions such as filter, orderby etc. Here, we are printing the entire Streaming Policies in the current Media Services Account
-    for i in results:
-        print(i.name)
+    # Print the list of streaming policies for the Media Services account.
+    for policy in results:
+        print(policy.name)
         
 list_streaming_policy(resource_group_name, account_name)
 #</ListStreamingPolicy>

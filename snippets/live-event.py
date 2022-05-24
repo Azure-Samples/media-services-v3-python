@@ -39,7 +39,7 @@ media_account = client.mediaservices.get(resource_group_name, account_name)
 
 #<CreateLiveEvent>
 # Set the name of the live event you want to create
-live_event_name = "sanjaystestliveevent"
+live_event_name = "myliveevent"
 
 # Set the properties that you want to set for the live event
 # For this sample, we want to add the location, encoding, live event input and stream options
@@ -144,8 +144,8 @@ get_live_event(resource_group_name, account_name, live_event_name)
 def list_live_event(resource_group_name, account_name):
     results = client.live_events.list(resource_group_name, account_name)
     # For this sample, we are printing the list of all live events in the current Media Services Account
-    for result in results:
-        print(result.name)
+    for liveevent in results:
+        print(liveevent.name)
         
 list_live_event(resource_group_name, account_name)
 #</ListLiveEvent>

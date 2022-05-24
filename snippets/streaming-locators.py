@@ -31,9 +31,11 @@ client = AzureMediaServices(default_credential, subscription_id)
 # create(resource_group_name: str, account_name: str, streaming_locator_name: str, parameters: _models_py3.StreamingLocator, **kwargs: Any) -> _models_py3.StreamingLocator
 streaming_locator_name = "mystreaminglocator"
 
+
 # Specify the name of the asset and the streaming policy you created or use one of the predefined streaming policies.
 # For the purpose of this sample, you will use an existing asset named "outputassetNamemySampleRandomID" and "Predefined_ClearStreamingOnly"
 # If you haven't created the asset and streaming policy, create them and use their names/identifiers with this code.
+
 # The predefined Streaming Policies available are: 'Predefined_DownloadOnly', 'Predefined_ClearStreamingOnly', 
 # 'Predefined_DownloadAndClearStreaming', 'Predefined_ClearKey', 'Predefined_MultiDrmCencStreaming' and 'Predefined_MultiDrmStreaming'.
 streaming_locator = StreamingLocator(asset_name="outputassetNamemySampleRandomID", streaming_policy_name="Predefined_ClearStreamingOnly")
@@ -48,7 +50,7 @@ create_streaming_locator(resource_group_name, account_name, streaming_locator_na
 # get(resource_group_name: str, account_name: str, streaming_locator_name: str, **kwargs: Any) -> _models_py3.StreamingLocator
 def get_streaming_locator(resource_group_name, account_name, streaming_locator_name):
     results = client.streaming_locators.get(resource_group_name, account_name, streaming_locator_name)
-    # You can get any property of a streaming locator. Here, you are printing the streaming locator name.
+    # Print the streaming locator name.
     print(results.name)
 
 get_streaming_locator(resource_group_name, account_name, streaming_locator_name)
@@ -59,7 +61,8 @@ get_streaming_locator(resource_group_name, account_name, streaming_locator_name)
 # list(resource_group_name: str, account_name: str, filter: Optional[str] = None, top: Optional[int] = None, orderby: Optional[str] = None, **kwargs: Any) -> Iterable[_models_py3.StreamingLocatorCollection]
 def list_streaming_locator(resource_group_name, account_name):
     results = client.streaming_locators.list(resource_group_name, account_name)
-    # List the streaming locators in the Media Services account. You can add additional functions such as filter, orderby, etc.
+    
+    # List the streaming locators in the Media Services account.
     for locator in results:
         print(locator.name)
         
@@ -71,6 +74,7 @@ list_streaming_locator(resource_group_name, account_name)
 # list_content_keys(resource_group_name: str, account_name: str, streaming_locator_name: str, **kwargs: Any) -> _models_py3.ListContentKeysResponse
 def list_streaming_locator_content_keys(resource_group_name, account_name, streaming_locator_name):
     results = client.streaming_locators.list_content_keys(resource_group_name, account_name, streaming_locator_name)
+    # Print the content keys.
     print(results.content_keys)
     
 list_streaming_locator_content_keys(resource_group_name, account_name, streaming_locator_name)
