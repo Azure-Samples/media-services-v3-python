@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to set up a custom H264 Content Aware encoding job."
+description: "Encode with a custom Transform using Content Aware H264 Encoding"
 ---
 
 # Encode with a custom Transform using Content Aware H264 Encoding

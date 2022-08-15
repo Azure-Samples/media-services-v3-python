@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to set up a custom encoding HEVC Content Aware Constrained job."
+description: "Encode with a custom Transform using HEVC Content Aware Encoding"
 ---
 
 # Encode with a custom Transform using HEVC Content Aware Encoding

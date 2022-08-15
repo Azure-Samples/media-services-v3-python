@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to set up a custom encoding job that can overlay an image on top of your video during encoding."
+description: "Encode with a custom Transform and overlay an image onto the video"
 ---
 
 # Encode with a custom Transform and overlay an image onto the video

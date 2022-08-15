@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to copy a section of a live event archive (output from the LiveOutput) to an MP4 file for use in downstream applications."
+description: "Encode with a custom Transform copying a section of a live event archive"
 ---
 
 # Encode with a custom Transform copying a section of a live event archive

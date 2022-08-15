@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to set up a custom encoding HEVC job."
+description: "Encode with a custom Transform using HEVC Encoding"
 ---
 
 # Encode with a custom Transform using HEVC Encoding

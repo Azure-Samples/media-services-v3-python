@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to set up a custom H264 encoding job with Sprite Thumbnail."
+description: "Encode with a custom Transform to create a sprite thumbnail"
 ---
 
 # Encode with a custom Transform to create a sprite thumbnail

@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to set up a custom encoding job that can create AAC Audio Profile during encoding."
+description: "Encode with a custom Transform and AACAudio onto the video"
 ---
 
 # Encode with a custom Transform and AACAudio onto the video

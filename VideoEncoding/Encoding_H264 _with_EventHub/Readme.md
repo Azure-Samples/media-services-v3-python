@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to set up a custom H264 with Event Hub."
+description: "Encode with a custom Transform using H264 Encoding and Event Grid"
 ---
 
 # Encode with a custom Transform using H264 Encoding and Event Grid
