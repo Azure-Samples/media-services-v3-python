@@ -1,7 +1,7 @@
 ---
 topic: sample
 languages:
-  - python
+  - Python
 products:
   - azure-media-services
 description: "This sample demonstrates how to create an encoding Transform that encodes multi channel audio to 5.1 outputs and stereo."
@@ -25,74 +25,40 @@ In this example we input an audio only source file with the following track layo
 
 We then create a list of TrackDescriptor type to allow us to selectively map the audio tracks from the input source file into a specific Channel on the output.  The order of these are important when output to the Transform next below.
 
-```csharp
-                trackList = 
-                [
-                    SelectAudioTrackById
-                    (
-                        track_id = 0, 
-                        channel_mapping = ChannelMapping.STEREO_LEFT
-                    ),
-                    SelectAudioTrackById
-                    (
-                        track_id = 1, 
-                        channel_mapping = ChannelMapping.STEREO_RIGHT
-                    ),
-                    SelectAudioTrackById
-                    (
-                        track_id = 2, 
-                        channel_mapping = ChannelMapping.FRONT_LEFT
-                    ),
-                    SelectAudioTrackById
-                    (
-                        track_id = 3, 
-                        channel_mapping = ChannelMapping.FRONT_RIGHT
-                    ),
-                    SelectAudioTrackById
-                    (
-                        track_id = 4, 
-                        channel_mapping = ChannelMapping.CENTER
-                    ),
-                    SelectAudioTrackById
-                    (
-                        track_id = 5, 
-                        channel_mapping = ChannelMapping.LOW_FREQUENCY_EFFECTS
-                    ),
-                    SelectAudioTrackById
-                    (
-                        track_id = 6, 
-                        channel_mapping = ChannelMapping.BACK_LEFT
-                    ),
-                    SelectAudioTrackById
-                    (
-                        track_id = 7, 
-                        channel_mapping = ChannelMapping.BACK_RIGHT
-                    ),
-                ]
-                
+```Python
+    trackList = [
+        SelectAudioTrackById(track_id=0, channel_mapping=ChannelMapping.STEREO_LEFT),
+        SelectAudioTrackById(track_id=1, channel_mapping=ChannelMapping.STEREO_RIGHT),
+        SelectAudioTrackById(track_id=2, channel_mapping=ChannelMapping.FRONT_LEFT),
+        SelectAudioTrackById(track_id=3, channel_mapping=ChannelMapping.FRONT_RIGHT),
+        SelectAudioTrackById(track_id=4, channel_mapping=ChannelMapping.CENTER),
+        SelectAudioTrackById(track_id=5, channel_mapping=ChannelMapping.LOW_FREQUENCY_EFFECTS),
+        SelectAudioTrackById(track_id=6, channel_mapping=ChannelMapping.BACK_LEFT),
+        SelectAudioTrackById(track_id=7, channel_mapping=ChannelMapping.BACK_RIGHT)
+    ]       
 ```
 
 A Transform is then created to generate the Stereo and 5.1 surround sound tracks from the track descriptor list. The first two tracks in the track descriptor list will be output to the Stereo AAC output defined as 2 channels in the Transform. The remaining 6 tracks will go into the second AAC output defined in the transform as using 6 channels.
 
-```csharp
-                transform_output = TransformOutput(
-                    preset =  StandardEncoderPreset(
-                        codecs =
-                        [
-                            // Add an AAC Audio layer for the audio encoding of the Stereo tracks to be mapped to.
-                            AACAudio(
-                                channels = 2,   // stereo track
-                                sampling_rate = 48000, 
-                                bitrate = 128000, 
-                                profile = AacAudioProfile.AAC_LC, label = "stereo"
-                            ),
-                            AACAudio(
-                                channels = 6,   // 5.1 surround sound track
-                                sampling_rate = 48000, 
-                                bitrate = 320000, 
-                                profile = AacAudioProfile.AAC_LC, label = "surround"
-                            ),
-                        ]
+```Python
+    transform_output = TransformOutput(
+        preset = StandardEncoderPreset(
+            codecs = [
+                AacAudio(
+                    channels=2,
+                    sampling_rate=48000,
+                    bitrate=128000,
+                    profile=AacAudioProfile.AAC_LC,
+                    label="stereo"
+                ),
+                AacAudio(
+                    channels=6,
+                    sampling_rate=48000,
+                    bitrate=320000,
+                    profile=AacAudioProfile.AAC_LC,
+                    label="surround"
+                )
+            ],
 ```
 
 After encoding, you will be able to playback the asset in the Azure Media Player and select from two track options.  One stereo track and one 5.1 surround sound AAC track.
