@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to use the built-in Copy Codec preset that can take a source video file that is already encoded using H264 and AAC audio, and copy it into MP4 tracks that are ready to be streamed by the AMS service."
+description: "Encode with a custom Transform using Built-in Copy Codec onto the video"
 ---
 
 # Encode with a custom Transform using Built-in Copy Codec onto the video

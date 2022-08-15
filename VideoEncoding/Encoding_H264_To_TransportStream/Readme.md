@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to set up a custom H264 To Transport Stream encoding job."
+description: "Encode with a custom Transform using H264 Encoding to transport stream"
 ---
 
 # Encode with a custom Transform using H264 Encoding to transport stream

@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to set up a custom encoding job with stitching two assets."
+description: "Encode with a custom Transform to stitch two assets"
 ---
 
 # Encode with a custom Transform to stitch two assets

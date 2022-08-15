@@ -4,7 +4,7 @@ languages:
     - Python
 products:
     - azure-media-services
-description: "This sample demonstrates how to set up a custom encoding job that can override a preset top of your video during encoding."
+description: "Encode with a custom Transform and preset override onto the video"
 ---
 
 # Encode with a custom Transform and preset override onto the video
