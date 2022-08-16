@@ -1,6 +1,7 @@
 # Azure Media Services v3 Python Samples
 
-Use this set of samples to get started with Azure Media Service v3 and Python.
+The samples in this repo are part of [Azure Media Services](https://media.microsoft.com).  
+Use this set of samples to get started with the Azure Media Service v3 API and Python client SDK.
 
 **NOTE**
 Owned and maintained by Microsoft. Please do not push changes directly to this repo.  Please fork the repo and set it as upstream and your own fork as origin. See the CONTRIBUTING.md file for more details.
