@@ -4,7 +4,7 @@ languages:
   - Python
 products:
   - azure-media-services
-description: "This sample demonstrates how to create an encoding Transform that encodes multi channel audio to 5.1 outputs and stereo."
+description: "Encoding for multi-channel audio with channel mapping Preset"
 ---
 
 # Encoding for multi-channel audio with channel mapping Preset
@@ -35,7 +35,7 @@ We then create a list of TrackDescriptor type to allow us to selectively map the
         SelectAudioTrackById(track_id=5, channel_mapping=ChannelMapping.LOW_FREQUENCY_EFFECTS),
         SelectAudioTrackById(track_id=6, channel_mapping=ChannelMapping.BACK_LEFT),
         SelectAudioTrackById(track_id=7, channel_mapping=ChannelMapping.BACK_RIGHT)
-    ]       
+    ]
 ```
 
 A Transform is then created to generate the Stereo and 5.1 surround sound tracks from the track descriptor list. The first two tracks in the track descriptor list will be output to the Stereo AAC output defined as 2 channels in the Transform. The remaining 6 tracks will go into the second AAC output defined in the transform as using 6 channels.
