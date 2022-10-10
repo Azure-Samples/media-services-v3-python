@@ -60,6 +60,10 @@ Install the [Azure Storage SDK for Python](https://pypi.org/project/azure-storag
 pip install azure-storage-blob
 ```
 
+``` bash
+pip install azure-mgmt-storage
+```
+
 You can optionally install ALL of the requirements for a given samples by using the "requirements.txt" file in the samples folder
 
 ``` bash

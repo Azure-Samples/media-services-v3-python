@@ -9,9 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AZURECREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AADCLIENTID: ${{ secrets.CLIENT_ID}}
-      AADSECRET: ${{ secrets.CLIENT_SECRET }}
-      AADTENANTID: ${{ secrets.TENANT_ID }}
      
     steps:
       - uses: actions/checkout@v2

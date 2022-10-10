@@ -115,9 +115,7 @@ allow_all_input_range=IPRange(name="AllowAll", address="0.0.0.0", subnet_prefix_
 # This will control the IP that the encoder is running on and restrict access to only that encoder IP range.
 # re-use the same range here for the sample, but in production, you can lock this down to the IP range for your on-premises
 # live encoder, laptop, or device that is sending the live stream
-live_event_input_access=LiveEventInputAccessControl(ip=IPAccessControl(allow=[allow_all_input_range]))      
-                                                                                                            
-                                                                                       
+live_event_input_access=LiveEventInputAccessControl(ip=IPAccessControl(allow=[allow_all_input_range]))                                                                             
 # Create the LiveEvent Preview IP access control object.
 # This will restrict which clients can view the preview endpoint
 # re-use the same range here for the sample, but in production, you can lock this to the IPs of your
@@ -154,7 +152,7 @@ live_event_create=LiveEvent(
         # Otherwise, leave as "None" to use pass-through mode
         encoding_type=LiveEventEncodingType.STANDARD,
         # OPTIONS for encoding type you can use:
-         # encoding_type=LiveEventEncodingType.PassthroughBasic, # Basic pass-through mode - the cheapest option!
+        # encoding_type=LiveEventEncodingType.PassthroughBasic, # Basic pass-through mode - the cheapest option!
         # encoding_type=LiveEventEncodingType.PassthroughStandard, # also known as standard pass-through mode (formerly "none")
         # encoding_type=LiveEventEncodingType.Premium1080p, # live transcoding up to 1080P 30fps with adaptive bitrate set
         # encoding_type=LiveEventEncodingType.Standard, # use live transcoding in the cloud for 720P 30fps with adaptive bitrate set
@@ -262,7 +260,8 @@ async def main():
                 description="Optional description when using more than one live output",
                 asset_name=output_asset.name,
                 manifest_name=manifest_name,      # The HLS and DASH manifest file name. This is recommended to set if you want a deterministic manifest path up front.
-                archive_window_length=timedelta(minutes=20),     # Sets a 20 minute asset archive. Uses ISO 8601 format string.
+                archive_window_length=timedelta(minutes=20),     # Sets a 20 minute asset archive window.
+                rewind_window_length=timedelta(minutes=20), # Sets a 20 minute time-shift (DVR) window length.
                 hls=Hls(
                     fragments_per_ts_segment=1        # Advanced setting when using HLS TS output only.
                 )
