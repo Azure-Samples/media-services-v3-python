@@ -262,7 +262,7 @@ async def main():
                 description="Optional description when using more than one live output",
                 asset_name=output_asset.name,
                 manifest_name=manifest_name,      # The HLS and DASH manifest file name. This is recommended to set if you want a deterministic manifest path up front.
-                archive_window_length=timedelta(hours=1),     # Sets an one hour time-shift DVR window. Uses ISO 8601 format string.
+                archive_window_length=timedelta(minutes=20),     # Sets a 20 minute asset archive. Uses ISO 8601 format string.
                 hls=Hls(
                     fragments_per_ts_segment=1        # Advanced setting when using HLS TS output only.
                 )
