@@ -22,8 +22,8 @@ import random
 #Get environmant variables
 load_dotenv()
 
-# Get the default Azure credential from the environment variables AZURE_CLIENT_ID and AZURE_CLIENT_SECRET and AZURE_TENTANT_ID
-default_credential = DefaultAzureCredential()
+
+default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # The file you want to upload.  For this example, put the file in the same folder as this script. 
 # The file ignite.mp4 has been provided for you. 

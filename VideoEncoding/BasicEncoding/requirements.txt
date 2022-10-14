@@ -1,3 +1,0 @@
-azure-identity
-azure-mgmt-media >= 8.0.0
-azure-storage-blob

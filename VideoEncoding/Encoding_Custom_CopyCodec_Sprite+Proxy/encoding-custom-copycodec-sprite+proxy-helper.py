@@ -46,8 +46,8 @@ mymodule = SourceFileLoader('encoding_job_helpers', '../../Common/Encoding/encod
 # Get environment variables
 load_dotenv()
 
-# Get the default Azure credential from the environment variables AZURE_CLIENT_ID and AZURE_CLIENT_SECRET and AZURE_TENTANT_ID
-default_credential = DefaultAzureCredential()
+
+default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # Get the environment variables AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP and AZURE_MEDIA_SERVICES_ACCOUNT_NAME
 subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')

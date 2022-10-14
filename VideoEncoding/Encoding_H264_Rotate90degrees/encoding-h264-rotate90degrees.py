@@ -30,8 +30,8 @@ import time
 #Get environment variables
 load_dotenv()
 
-# Get the default Azure credential from the environment variables AZURE_CLIENT_ID and AZURE_CLIENT_SECRET and AZURE_TENTANT_ID
-default_credential = DefaultAzureCredential()
+
+default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
 subscription_id = os.getenv('SUBSCRIPTIONID')

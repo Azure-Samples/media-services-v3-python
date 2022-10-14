@@ -11,10 +11,10 @@ import random
 #Get environment variables
 load_dotenv()
 
-# Get the default Azure credential from the environment variables AZURE_CLIENT_ID and AZURE_CLIENT_SECRET and AZURE_TENTANT_ID
-default_credential = DefaultAzureCredential()
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP, STORAGEACCOUNTNAME, AZURE_CLIENT_ID and AZURE_CLIENT_SECRET
+default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
+
+# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP, ACCOUNTNAME
 subscription_id = os.getenv('SUBSCRIPTIONID')
 resource_group = os.getenv('RESOURCEGROUP')
 account_name = os.getenv('ACCOUNTNAME')

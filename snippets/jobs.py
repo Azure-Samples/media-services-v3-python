@@ -9,8 +9,8 @@ import os
 # After this call, environment variables can be referenced with os.getenv("NAMEOFVARIABLE")
 load_dotenv()
 
-# Get the default Azure credential from the environment variables AZURE_CLIENT_ID and AZURE_CLIENT_SECRET and AZURE_TENTANT_ID
-default_credential = DefaultAzureCredential()
+
+default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # The AMS Client
 # From SDK

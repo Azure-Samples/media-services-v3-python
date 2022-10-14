@@ -16,10 +16,10 @@ subscriptionId = os.getenv('SUBSCRIPTIONID')
 #</EnvironmentVariables>
 
 #<DefaultAzureCredential>
-# Get the default Azure credential from the environment variables AZURE_CLIENT_ID and AZURE_CLIENT_SECRET and AZURE_TENTANT_ID
+
 from azure.identity import DefaultAzureCredential
 
-defaultCredential = DefaultAzureCredential()
+defaultCredential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 #<DefaultAzureCredential>
 
 # <CreateClient>

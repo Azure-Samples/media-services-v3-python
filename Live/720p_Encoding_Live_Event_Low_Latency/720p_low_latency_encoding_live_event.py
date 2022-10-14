@@ -35,8 +35,8 @@ import asyncio
 from datetime import timedelta
 import time
 from dotenv import load_dotenv
-from azure.identity.aio import DefaultAzureCredential
-from azure.mgmt.media.aio import AzureMediaServices
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.media import AzureMediaServices
 from azure.mgmt.media.models import (
     Asset,
     IPRange,
@@ -63,8 +63,8 @@ import random
 load_dotenv()
 
 # This sample uses the default Azure Credential object, which relies on the environment variable settings.
-# Get the default Azure credential from the environment variables AZURE_CLIENT_ID and AZURE_CLIENT_SECRET and AZURE_TENTANT_ID
-default_credential = DefaultAzureCredential()
+
+default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
 subscription_id = os.getenv('SUBSCRIPTIONID')

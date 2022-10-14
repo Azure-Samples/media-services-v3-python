@@ -30,7 +30,7 @@ storage_account_name=os.getenv("STORAGEACCOUNTNAME")
 
 #<CreateAMSClient>
 # Create the Media Services client and authenticate using the DefaultAzureCredential
-default_credential = DefaultAzureCredential()
+default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 client = AzureMediaServices(default_credential, subscription_id)
 
 # Get the media services account object for information on the current location.
