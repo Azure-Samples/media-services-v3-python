@@ -130,6 +130,7 @@ job_name = 'MyEncodingLiveArchiveToMP4Job'+ uniqueness
 print(f"Creating encoding job {job_name}")
 # files = (source_file)
 
+#<TopBitRate>
 # Use this to select the top bitrate from the live archive asset
 # The filter property allows you to select the "Top" bitrate which would be the 
 # highest bitrate provided by the live encoder.
@@ -137,10 +138,19 @@ video_track_selection = SelectVideoTrackByAttribute(
   attribute=TrackAttribute.BITRATE,
   filter=AttributeFilter.TOP    # Use this to select the top bitrate in this ABR asset for the job
 )
-
+#</TopBitRate>
+#<SubclipJobInput>
 # Create Job Input and Job Output Asset
 input = JobInputAsset(
   asset_name=input_archive_name,
+  start: {
+            odataType:"#Microsoft.Media.AbsoluteClipTime",
+            time: "PT30S" // Trim the first 30 seconds off the live archive.
+        },
+        end : {
+            odataType:"#Microsoft.Media.AbsoluteClipTime",
+            time: "PT5M30S" // Clip off the end after 5 minutes and 30 seconds.
+        },
   input_definitions=[
     FromAllInputFile(
       included_tracks=[
@@ -150,7 +160,7 @@ input = JobInputAsset(
   ]
 )
 outputs = JobOutputAsset(asset_name=out_asset_name)
-
+#</SubclipJobInput>
 # Create Job object and then create Transform Job
 the_job = Job(input=input,outputs=[outputs])
 job: Job = client.jobs.create(resource_group, account_name, transform_name, job_name, parameters=the_job)
