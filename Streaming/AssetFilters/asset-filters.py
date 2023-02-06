@@ -29,12 +29,12 @@ load_dotenv()
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-account_name = os.getenv('ACCOUNTNAME')
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
-# The file you want to upload.  For this example, put the file in the same folder as this script. 
-# The file ignite.mp4 has been provided for you. 
+# The file you want to upload.  For this example, put the file in the same folder as this script.
+# The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
@@ -86,8 +86,8 @@ working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
 
-# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
-# Adjust the path as needed depending on how you are launching this python sample file. 
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder.
+# Adjust the path as needed depending on how you are launching this python sample file.
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
@@ -144,11 +144,11 @@ print(job_state.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-  while t: 
-    mins, secs = divmod(t, 60) 
-    timer = '{:02d}:{:02d}'.format(mins, secs) 
-    print(timer, end="\r") 
-    time.sleep(1) 
+  while t:
+    mins, secs = divmod(t, 60)
+    timer = '{:02d}:{:02d}'.format(mins, secs)
+    print(timer, end="\r")
+    time.sleep(1)
     t -= 1
   job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
   if(job_current.state == "Finished"):
@@ -177,16 +177,16 @@ if output_asset:
     streaming_locator_name=locator_name,
     parameters=streaming_locator
   )
-  
+
   if locator:
     print(f"The streaming locator {locator_name} was successfully created!")
   else:
     raise Exception(f"Error while creating streaming locator {locator_name}")
-  
+
   # Create the Asset filters
   print("Creating an asset filter...")
   asset_filter_name = 'filter1'
-  
+
   # Create the asset filter
   asset_filter = client.asset_filters.create_or_update(
     resource_group_name=resource_group,
@@ -203,51 +203,51 @@ if output_asset:
       presentation_time_range=PresentationTimeRange(start_timestamp=100000000, end_timestamp=300000000)
     )
   )
-  
+
   if asset_filter:
     print(f"The asset filter ({asset_filter_name}) was successfully created.")
     print()
   else:
     raise ValueError("There was an issue creating the asset filter.")
-  
+
   if locator.name:
     hls_format = "format=m3u8-cmaf"
     dash_format = "format=mpd-time-cmaf"
-    
+
     # Get the default streaming endpoint on the account
     streaming_endpoint = client.streaming_endpoints.get(
       resource_group_name=resource_group,
       account_name=account_name,
       streaming_endpoint_name=streaming_endpoint_name
     )
-    
+
     if streaming_endpoint.resource_state != "Running":
       print(f"Streaming endpoint is stopped. Starting endpoint named {streaming_endpoint_name}")
       client.streaming_endpoints.begin_start(resource_group, account_name, streaming_endpoint_name)
-    
+
     basename_tup = os.path.splitext(source_file)    # Extracting the filename and extension
     path_extension = basename_tup[1]   # Setting extension of the path
     manifest_name = os.path.basename(source_file).replace(path_extension, "")
     print(f"The manifest name is: {manifest_name}")
     manifest_base = f"https://{streaming_endpoint.host_name}/{locator.streaming_locator_id}/{manifest_name}.ism/mainfest"
-    
+
     hls_manifest = ""
     if asset_filter_name is None:
       hls_manifest = f'{manifest_base}({hls_format})'
     else:
       hls_manifest = f'{manifest_base}({hls_format},filter={asset_filter_name})'
-      
+
     print(f"The HLS (MP4) manifest URL is: {hls_manifest}")
     print("Open the following URL to playback the live stream in an HLS compliant player (HLS.js, Shaka, ExoPlayer) or directly in an iOS device")
     print({hls_manifest})
     print()
-    
+
     dash_manifest = ""
     if asset_filter_name is None:
       dash_manifest = f'{manifest_base}({dash_format})'
     else:
       dash_manifest = f'{manifest_base}({dash_format},filter={asset_filter_name})'
-      
+
     print(f"The DASH manifest URL is: {dash_manifest}")
     print("Open the following URL to playbackk the live stream from the LiveOutput in the Azure Media Player")
     print(f"https://ampdemo.azureedge.net/?url={dash_manifest}&heuristicprofile=lowlatency")

@@ -36,10 +36,10 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-account_name = os.getenv('ACCOUNTNAME')
+# Get the environment variables
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = "encode_copy_live"
@@ -53,7 +53,7 @@ in_description = 'inputdescription' + uniqueness
 # The asset_id will be used for the container parameter for the storage SDK after the asset is created by the AMS client.
 in_asset = Asset(alternate_id=in_alternate_id, description=in_description)
 
-# Set this to the name of the Asset used in your LiveOutput. This would be the archived live event Asset name. 
+# Set this to the name of the Asset used in your LiveOutput. This would be the archived live event Asset name.
 input_archive_name = 'archiveAsset-2793'
 
 # Set the attributes of the output Asset using the random number
@@ -102,8 +102,8 @@ transform_output = TransformOutput(
       Mp4Format(
         filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}"
       )
-    ]  
-  ), 
+    ]
+  ),
   # What should we do with the job if there is an error?
   on_error=OnErrorType.STOP_PROCESSING_JOB,
   # What is the relative priority of this job to others? Normal, high or low?
@@ -132,7 +132,7 @@ print(f"Creating encoding job {job_name}")
 
 #<TopBitRate>
 # Use this to select the top bitrate from the live archive asset
-# The filter property allows you to select the "Top" bitrate which would be the 
+# The filter property allows you to select the "Top" bitrate which would be the
 # highest bitrate provided by the live encoder.
 video_track_selection = SelectVideoTrackByAttribute(
   attribute=TrackAttribute.BITRATE,
@@ -173,11 +173,11 @@ print(job_state.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-    while t: 
-        mins, secs = divmod(t, 60) 
-        timer = '{:02d}:{:02d}'.format(mins, secs) 
-        print(timer, end="\r") 
-        time.sleep(1) 
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs)
+        print(timer, end="\r")
+        time.sleep(1)
         t -= 1
     job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
     if(job_current.state == "Finished"):

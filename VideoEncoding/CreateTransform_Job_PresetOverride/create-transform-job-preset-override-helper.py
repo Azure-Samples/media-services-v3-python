@@ -1,9 +1,9 @@
 
 # This sample demonstrates how to create an very simple Transform to use for submitting any custom Job into.
-# Creating a very basic transform in this fashion allows you to treat the AMS v3 API more like the legacy v2 API where 
-# transforms were not required, and you could submit any number of custom jobs to the same endpoint. 
+# Creating a very basic transform in this fashion allows you to treat the AMS v3 API more like the legacy v2 API where
+# transforms were not required, and you could submit any number of custom jobs to the same endpoint.
 # In the new v3 API, the default workflow is to create a transform "template" that holds a unique queue of jobs just for that
-# specific "recipe" of custom or pre-defined encoding. 
+# specific "recipe" of custom or pre-defined encoding.
 
 # This sample shows how to create the blank empty Transform, and then submit a couple unique custom jobs to it,
 # overriding the blank empty Transform.
@@ -24,7 +24,7 @@ from azure.mgmt.media.models import (
   PngImage,
   Mp4Format,
   PngLayer,
-  PngFormat, 
+  PngFormat,
   AacAudioProfile,
   OnErrorType,
   Priority,
@@ -43,7 +43,7 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP and AZURE_MEDIA_SERVICES_ACCOUNT_NAME
+# Get the environment variables
 subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
 resource_group = os.getenv('AZURE_RESOURCE_GROUP')
 account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
@@ -60,8 +60,8 @@ mymodule.set_subscription_id(subscription_id)
 mymodule.create_default_azure_credential(default_credential)
 mymodule.create_azure_media_services(client)
 
-# The file you want to upload.  For this example, the file is placed under Media folder. 
-# The file ignite.mp4 has been provided for you. 
+# The file you want to upload.  For this example, the file is placed under Media folder.
+# The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
 name_prefix = "encodeH264"
 output_folder = "../../Output/"
@@ -75,13 +75,13 @@ async def main():
   async with client:
     # Create a new Standard encoding Transform for H264
     print(f"Creating empty, blank, Standard Encoding transform named: {transform_name}")
-    
+
     # In this sample, we create the simplest of Transforms allowed by the API to later submit custom jobs against.
     # Even though we define a single layer H264 preset here, we are going to override it later with a custom job level preset.
     # This allows you to treat this single Transform queue like the legacy v2 API, which only supported a single Job queue type.
     # In v3 API, the typical workflow that you will see in other samples is to create a transform "recipe" and submit jobs to it
-    # that are all of the same type of output. 
-    # Some customers need the flexibility to submit custom Jobs. 
+    # that are all of the same type of output.
+    # Some customers need the flexibility to submit custom Jobs.
 
     # First we create an mostly empty TransformOutput with a very basic H264 preset that we override later.
     # If a Job were submitted to this base Transform, the output would be a single MP4 video track at 1 Mbps.
@@ -124,21 +124,21 @@ async def main():
       print()
     except:
       print("There was an error creating the transform.")
-    
+
     input = await mymodule.get_job_input_type(source_file, {}, name_prefix, uniqueness)
     output_asset_name = f"{name_prefix}-output-{uniqueness}"
     job_name = f"{name_prefix}-job-{uniqueness}"
-    
+
     print(f"Creating the output asset (container) to encode the content into...")
     output_asset = await client.assets.create_or_update(resource_group, account_name, output_asset_name, {})
     if output_asset:
         print("Output Asset created.")
     else:
         print("There was a problem creating an output asset.")
-    
+
     print()
     print(f"Creating a new custom preset override and submitting the job to the empty transform {transform_name} job queue...")
-    
+
     # Create a new Preset Override to define a custom standard encoding preset
     standard_preset_h264 = StandardEncoderPreset(
         codecs = [
@@ -154,7 +154,7 @@ async def main():
                         label = "HD-3600kbps"   # This label is used to modify the file name in the output formats
                     )
                 ]
-            ), 
+            ),
             AacAudio(
                 # Add an AAC Audio Layer for the audio encoding
                 channels = 2,
@@ -167,11 +167,11 @@ async def main():
             Mp4Format(filename_pattern = "Video-{Basename}-{Label}-{Bitrate}{Extension}")
         ]
     )
-    
+
     # Submit the H264 encoding custom job, passing in the preset override defined above.
     # print(f"Submitting the encoding job to the {transform_name} job queue...")
     job = await mymodule.submit_job(transform_name, job_name, input, output_asset_name, standard_preset_h264)
-    
+
     # Next, we will create another preset override that uses HEVC instead and submit it against the same simple transform
     # Create a new Preset Override to define a custom standard encoding preset
     standard_preset_HEVC = StandardEncoderPreset(
@@ -190,24 +190,24 @@ async def main():
                         label = "HD-1800kbps" # This label is used to modify the file name in the output formats
                     )
                 ]
-            ), 
+            ),
             AacAudio(
                 # Add an AAC audio layer for the audio encoding
                 channels = 2,
                 sampling_rate = 48000,
                 bitrate = 128000,
-                profile = AacAudioProfile.AAC_LC    
+                profile = AacAudioProfile.AAC_LC
             )
         ],
         formats=[
             Mp4Format(filename_pattern = "Video-{Basename}-{Label}-{Bitrate}{Extension}")
         ]
     )
-    
+
     # Let's update some names to re-use for the HEVC job we want to submit
     job_name_HEVC = job_name + '_HEVC'
     out_asset_name_HEVC = output_asset_name + '_HEVC'
-    
+
     # Create a new output asset
     print(f"Creating a new output asset (container) to encode the content into...")
     output_asset2 = await client.assets.create_or_update(resource_group, account_name, out_asset_name_HEVC, {})
@@ -215,28 +215,28 @@ async def main():
         print("Output Asset created.")
     else:
         print("There was a problem creating an output asset.")
-    
+
     # Submit the next HEVC custom job, passing in the preset override defined above.
     job2 = await mymodule.submit_job(transform_name, job_name_HEVC, input, out_asset_name_HEVC, standard_preset_HEVC)
-    
+
     print(f"Waiting for encoding jobs to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
     job2 = await mymodule.wait_for_job_to_finish(transform_name, job_name_HEVC)
-    
+
     # Wait for the first H264 job to finish and then download the output
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-    
+
     # Check on the status of the second HEVC encoding job and then download the output
     if job2.state == 'Finished':
       await mymodule.download_results(out_asset_name_HEVC, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-    
+
   # closing media client
   print('Closing media client')
   await client.close()
-    
+
   # closing credential client
   print('Closing credential client')
   await default_credential.close()

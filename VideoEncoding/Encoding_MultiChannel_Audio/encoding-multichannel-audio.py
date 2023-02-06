@@ -31,10 +31,10 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-account_name = os.getenv('ACCOUNTNAME')
+# Get the environment variables
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # The file you want to upload.  For this example, the file is placed under Media folder.
 # Provide a sample file with 8 discrete audio tracks as layout is defined above.
@@ -87,8 +87,8 @@ working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
 
-# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
-# Adjust the path as needed depending on how you are launching this python sample file. 
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder.
+# Adjust the path as needed depending on how you are launching this python sample file.
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
@@ -106,7 +106,7 @@ print(f"Creating Standard Encoding transform named: {transform_name}" )
 # 4. Right front surround
 # 5. Center surround
 # 6. Low frequency
-# 7. Back left 
+# 7. Back left
 # 8. Back right
 
 # The channel mapping support is limited to only outputting a single AAC stereo track, followed by a 5.1 audio AAC track in this sample.
@@ -143,7 +143,7 @@ transform_output = TransformOutput(
       # Note that since you have multiple AAC outputs defined above, you have to use a macro that produces unique names per AAC Layer
       # Either {Label} or {Bitrate} should suffice
       # By creating outputFiles and assigning the labels we can control which output tracks are muxed into the Mp4 files
-      # If you choose to mux both the stereo and surround tracks into a single MP4 output, you can remove the outputFiles and remove the second MP4 format object. 
+      # If you choose to mux both the stereo and surround tracks into a single MP4 output, you can remove the outputFiles and remove the second MP4 format object.
       Mp4Format(filename_pattern="{Basename}-{Label}-{Bitrate}{Extension}", output_files=[OutputFile(labels=["stereo", "surround"])])
     ]
   ),
@@ -192,11 +192,11 @@ print(job_state.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-    while t: 
-        mins, secs = divmod(t, 60) 
-        timer = '{:02d}:{:02d}'.format(mins, secs) 
-        print(timer, end="\r") 
-        time.sleep(1) 
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs)
+        print(timer, end="\r")
+        time.sleep(1)
         t -= 1
     job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
     if(job_current.state == "Finished"):

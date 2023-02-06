@@ -33,7 +33,7 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP and AZURE_MEDIA_SERVICES_ACCOUNT_NAME
+# Get the environment variables
 subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
 resource_group = os.getenv('AZURE_RESOURCE_GROUP')
 account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
@@ -49,7 +49,7 @@ mymodule.set_subscription_id(subscription_id)
 mymodule.create_default_azure_credential(default_credential)
 mymodule.create_azure_media_services(client)
 
-# The file you want to upload.  For this example, put the file in the same folder as this script. 
+# The file you want to upload.  For this example, put the file in the same folder as this script.
 # Provide a sample file with 8 discrete audio tracks as layout is defined above. Path is relative to the working directory for Python
 source_file = "surround-audio.mp4"
 name_prefix = "encodeH264_multi_channel"
@@ -72,7 +72,7 @@ async def main():
     # 4. Right front surround
     # 5. Center surround
     # 6. Low frequency
-    # 7. Back left 
+    # 7. Back left
     # 8. Back right
 
     # The channel mapping support is limited to only outputting a single AAC stereo track, followed by a 5.1 audio AAC track in this sample.
@@ -106,7 +106,7 @@ async def main():
           # Note that since you have multiple AAC outputs defined above, you have to use a macro that produces unique names per AAC Layer
           # Either {Label} or {Bitrate} should suffice
           # By creating outputFiles and assigning the labels we can control which output tracks are muxed into the Mp4 files
-          # If you choose to mux both the stereo and surround tracks into a single MP4 output, you can remove the outputFiles and remove the second MP4 format object. 
+          # If you choose to mux both the stereo and surround tracks into a single MP4 output, you can remove the outputFiles and remove the second MP4 format object.
           Mp4Format(filename_pattern="{Basename}-{Label}-{Bitrate}{Extension}", output_files=[OutputFile(labels=["stereo", "surround"])])
         ]
       ),
@@ -134,35 +134,35 @@ async def main():
       print()
     except:
       print("There was an error creating the transform.")
-    
+
     input = await mymodule.get_job_input_type(source_file, {}, name_prefix, uniqueness)
     output_asset_name = f"{name_prefix}-output-{uniqueness}"
     job_name = f"{name_prefix}-job-{uniqueness}"
-    
+
     print(f"Creating the output asset (container) to encode the content into...")
     output_asset = await client.assets.create_or_update(resource_group, account_name, output_asset_name, {})
     if output_asset:
         print("Output Asset created.")
     else:
         print("There was a problem creating an output asset.")
-    
-    print() 
+
+    print()
     print(f"Submitting the encoding job to the {transform_name} job queue...")
     # NOTE: This call has been modified from previous samples in the repository to now take the list of Input Definitions instead of just the filename.
     # This passes in the IncludedTracks list to map during the Transform.
     job = await mymodule.submit_job_with_track_definitions(transform_name, job_name, input, output_asset_name, input_definitions)
-    
+
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
-    
+
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-    
+
   # closing media client
   print('Closing media client')
   await client.close()
-    
+
   # closing credential client
   print('Closing credential client')
   await default_credential.close()

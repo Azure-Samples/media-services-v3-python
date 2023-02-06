@@ -25,13 +25,13 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-account_name = os.getenv('ACCOUNTNAME')
+# Get the environment variables
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
-# The file you want to upload.  For this example, put the file in the same folder as this script. 
-# The file ignite.mp4 has been provided for you. 
+# The file you want to upload.  For this example, put the file in the same folder as this script.
+# The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
@@ -80,8 +80,8 @@ working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
 
-# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
-# Adjust the path as needed depending on how you are launching this python sample file. 
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder.
+# Adjust the path as needed depending on how you are launching this python sample file.
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
@@ -92,8 +92,8 @@ transform_name = 'AudioAnalyzerTransformBasic'
 transform_output = TransformOutput(
   preset=AudioAnalyzerPreset(
     audio_language="en-GB",   # Be sure to modify this to your desired language code in BCP-47 format.
-    # Set the language to British English - see see https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support#speech-to-text 
-    
+    # Set the language to British English - see see https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support#speech-to-text
+
     # There are two modes available, Basic and Standard
     # Basic : This mode performs speech-to-text transcription and generation of a VTT subtitle/caption file.
     #         The output of this mode includes an Insights JSON file including only the keywords, transcription, and timing information.
@@ -130,8 +130,8 @@ files = (source_file)
 
 input = JobInputAsset(asset_name=in_asset_name)
 
-# The next section is mostly optional, but shows how you can override the default language that was set when the Transform was first created above. 
-# Use this method if you need to change the language used in the same Transform.  
+# The next section is mostly optional, but shows how you can override the default language that was set when the Transform was first created above.
+# Use this method if you need to change the language used in the same Transform.
 # This can help reduce the number of Transforms you have to define.  For example, you would not want to have a "Basic Audio Transform" for every language supported in AMS.
 
 # First we re-define the preset that we want to use for this specific Job...
@@ -141,8 +141,8 @@ preset_override = AudioAnalyzerPreset(
   mode=AudioAnalysisMode.BASIC
 )
 
-# Then we use the PresetOverride property of the JobOutput to pass in the override values to use on this single Job 
-# without the need to create a completely separate and new Transform with another language code or Mode setting. 
+# Then we use the PresetOverride property of the JobOutput to pass in the override values to use on this single Job
+# without the need to create a completely separate and new Transform with another language code or Mode setting.
 # This can save a lot of complexity in your AMS account and reduce the number of Transforms used.
 
 # Create Job output asset
@@ -160,11 +160,11 @@ print(job_state.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-    while t: 
-        mins, secs = divmod(t, 60) 
-        timer = '{:02d}:{:02d}'.format(mins, secs) 
-        print(timer, end="\r") 
-        time.sleep(1) 
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs)
+        print(timer, end="\r")
+        time.sleep(1)
         t -= 1
     job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
     if(job_current.state == "Finished"):

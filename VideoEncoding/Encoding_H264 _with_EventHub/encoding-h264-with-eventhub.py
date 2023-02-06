@@ -1,9 +1,9 @@
 # This sample uses the following settings from the .env setting file to connect to a pre-configured Event Hub and Event Grid subscription
 # To use this sample, you first need to go into your Media Services account and configure Event Grid to submit
-# events for all types into an Event Hub endpoint. 
-# Once you configure the Event Grid subscription to push events to an Event Hub, you can then fill out the settings in 
+# events for all types into an Event Hub endpoint.
+# Once you configure the Event Grid subscription to push events to an Event Hub, you can then fill out the settings in
 # your .env settings file for the following values:
-# 
+#
 # # Event Hub settings to listen to Event Grid subscription:
 #      EVENTHUB_CONNECTION_STRING= ""
 #      EVENTHUB_NAME= ""
@@ -47,15 +47,15 @@ load_dotenv()
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-account_name = os.getenv('ACCOUNTNAME')
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # The EventGrid connection information for processing Event Grid subscription events for Media Services
 endpoint = os.getenv('EVENTGRID_TOPIC_ENDPOINT')
 
-# The file you want to upload.  For this example, put the file in the same folder as this script. 
-# The file ignite.mp4 has been provided for you. 
+# The file you want to upload.  For this example, put the file in the same folder as this script.
+# The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
@@ -107,8 +107,8 @@ working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
 
-# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
-# Adjust the path as needed depending on how you are launching this python sample file. 
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder.
+# Adjust the path as needed depending on how you are launching this python sample file.
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
@@ -231,11 +231,11 @@ print(job_state.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-    while t: 
-        mins, secs = divmod(t, 60) 
-        timer = '{:02d}:{:02d}'.format(mins, secs) 
-        print(timer, end="\r") 
-        time.sleep(1) 
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs)
+        print(timer, end="\r")
+        time.sleep(1)
         t -= 1
     job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
     if(job_current.state == "Finished"):

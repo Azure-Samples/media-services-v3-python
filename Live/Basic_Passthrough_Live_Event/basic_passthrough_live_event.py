@@ -25,8 +25,8 @@
 # 7) Start the Live Event - this can take a little bit.
 # 8) Get the preview endpoint to monitor in a player for DASH or HLS.
 # 9) Get the ingest RTMP endpoint URL for use in OBS Studio.
-#    Set up OBS studio and start the broadcast.  Monitor the stream in 
-#    your DASH or HLS player of choice. 
+#    Set up OBS studio and start the broadcast.  Monitor the stream in
+#    your DASH or HLS player of choice.
 # 10) Create a new Streaming Locator on the recording Asset object from step 5.
 # 11) Get the URLs for the HLS and DASH manifest to share with your audience
 #    or CMS system. This can also be created earlier after step 5 if desired.
@@ -66,10 +66,10 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-account_name = os.getenv('ACCOUNTNAME')
+# Get the environment variables
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
@@ -94,11 +94,11 @@ client = AzureMediaServices(default_credential, subscription_id)
 # Read the following - https://docs.microsoft.com/azure/media-services/latest/live-events-outputs-concept
 # 1) Understand the billing implications for the various states
 # 2) Understand the different live event types, pass-through and encoding
-# 3) Understand how to use long-running async operations 
-# 4) Understand the available Standby mode and how it differs from the Running Mode. 
+# 3) Understand how to use long-running async operations
+# 4) Understand the available Standby mode and how it differs from the Running Mode.
 # 5) Understand the differences between a LiveOutput and the Asset that it records to.  They are two different concepts.
 #    A live output can be considered as the "tape recorder" and the Asset is the tape that is inserted into it for recording.
-# 6) Understand the advanced options such as low latency, and live transcription/captioning support. 
+# 6) Understand the advanced options such as low latency, and live transcription/captioning support.
 #    Live Transcription - https://docs.microsoft.com/en-us/azure/media-services/latest/live-transcription
 #    Low Latency - https://docs.microsoft.com/en-us/azure/media-services/latest/live-event-latency
 
@@ -115,9 +115,9 @@ allow_all_input_range=IPRange(name="AllowAll", address="0.0.0.0", subnet_prefix_
 # This will control the IP that the encoder is running on and restrict access to only that encoder IP range.
 # re-use the same range here for the sample, but in production, you can lock this down to the IP range for your on-premises
 # live encoder, laptop, or device that is sending the live stream
-live_event_input_access=LiveEventInputAccessControl(ip=IPAccessControl(allow=[allow_all_input_range]))      
-                                                                                                            
-                                                                                       
+live_event_input_access=LiveEventInputAccessControl(ip=IPAccessControl(allow=[allow_all_input_range]))
+
+
 # Create the LiveEvent Preview IP access control object.
 # This will restrict which clients can view the preview endpoint
 # re-se the same range here for the sample, but in production, you can lock this to the IPs of your
@@ -146,7 +146,7 @@ live_event_create=LiveEvent(
         # key_frame_interval_duration = timedelta(seconds = 2),       # Set this to match the ingest encoder's settings. This should not be used for encoding channels
         access_token='9eb1f703b149417c8448771867f48501'       # Use this value when you want to make sure the ingest URL is static and always the same. If omited, the service will generate a random GUID values.
     ),
-    
+
     # 2) Set the live event to use pass-through or cloud encoding modes...
     encoding=LiveEventEncoding(
         # Set this to Basic pass-through, Standard pass-through, Standard or Premium1080P to use the cloud live encoder.
@@ -158,31 +158,31 @@ live_event_create=LiveEvent(
         # encoding_type=LiveEventEncodingType.PassthroughStandard, # also known as standard pass-through mode (formerly "none")
         # encoding_type=LiveEventEncodingType.Premium1080p, # live transcoding up to 1080P 30fps with adaptive bitrate set
         # encoding_type=LiveEventEncodingType.Standard, # use live transcoding in the cloud for 720P 30fps with adaptive bitrate set
-        
+
         # OPTIONS using live cloud encoding type:
         # key_frame_interval=timedelta(seconds = 2), # If this value is not set for an encoding live event, the fragment duration defaults to 2 seconds. The value cannot be set for pass-through live events.
-        
+
         # For Low Latency HLS Live streaming, there are two new custom presets available:
         # "720p-3-Layer": For use with a Standard 720P encoding_type live event
         # {"ElementaryStreams":[{"Type":"Video","BitRate":2500000,"Width":1280,"Height":720},{"Type":"Video","BitRate":1000000,"Width":960,"Height":540},{"Type":"Video","BitRate":400000,"Width":640,"Height":360}]}"
         # "1080p-4-Layer":  For use with a Premium1080p encoding_type live event
         # {"ElementaryStreams":[{"Type":"Video","BitRate":4500000,"Width":1920,"Height":1080},{"Type":"Video","BitRate":2200000,"Width":1280,"Height":720},{"Type":"Video","BitRate":1000000,"Width":960,"Height":540},{"Type":"Video","BitRate":400000,"Width":640,"Height":360}]}
-        
-        # preset_name=None, # only used for custom defined presets. 
+
+        # preset_name=None, # only used for custom defined presets.
         # stretch_mode= None # can be used to determine stretch on encoder mode
     ),
-    
+
     # 3) Set up the Preview endpoint for monitoring based on the settings above we already set.
     preview=live_event_preview,
-    
+
     # 4) Set up more advanced options on the live event. Low Latency is the most common one.
     # To enable Apple's Low Latency HLS (LL-HLS) streaming, you must use "LOW_LATENCY_V2" stream option
     stream_options=[StreamOptionsFlag.LOW_LATENCY]
-    
+
     #5) Optionally, enable live transcriptions if desired.
     # WARNING : This is extra cost ($$$), so please check pricing before enabling. Transcriptions are not supported on PassthroughBasic.
     #           switch this sample to use encodingType: "PassthroughStandard" first before un-commenting the transcriptions object below.
-    
+
     # transcriptions = LiveEventTranscription(
     #     input_track_selection = [],     # Choose which track to transcribe on the source input.
     #     # The value should be in BCP-47 format (e.g: 'en-US'). See https://go.microsoft.com/fwlink/?linkid=2133742
@@ -197,13 +197,13 @@ print("Creating the LiveEvent, please be patient as this can take time to comple
 print("Live Event creation is an async operation in Azure and timing can depend on resources available.")
 print()
 
-# When autostart is set to true, the Live Event will be started after creation. 
-# That means, the billing starts as soon as the Live Event starts running. 
+# When autostart is set to true, the Live Event will be started after creation.
+# That means, the billing starts as soon as the Live Event starts running.
 # You must explicitly call Stop on the Live Event resource to halt further billing.
 # The following operation can sometimes take awhile. Be patient.
-# On optional workflow is to first call allocate() instead of create. 
-# https://docs.microsoft.com/en-us/rest/api/media/liveevents/allocate 
-# This allows you to allocate the resources and place the live event into a "Standby" mode until 
+# On optional workflow is to first call allocate() instead of create.
+# https://docs.microsoft.com/en-us/rest/api/media/liveevents/allocate
+# This allows you to allocate the resources and place the live event into a "Standby" mode until
 # you are ready to transition to "Running". This is useful when you want to pool resources in a warm "Standby" state at a reduced cost.
 # The transition from Standby to "Running" is much faster than cold creation to "Running" using the autostart property.
 # Returns a long running operation polling object that can be used to poll until completion.
@@ -222,29 +222,29 @@ async def main():
             print(await poller.result())
         else:
             raise ValueError('Live Event creation failed!')
-        
-        # Create an Asset for the LiveOutput to use. Think of this as the "tape" that will be recorded to. 
-        # The asset entity points to a folder/container in your Azure Storage account. 
+
+        # Create an Asset for the LiveOutput to use. Think of this as the "tape" that will be recorded to.
+        # The asset entity points to a folder/container in your Azure Storage account.
         print(f"Creating an asset named: {asset_name}")
         print()
 
         out_alternate_id = f'outputALTid-{uniqueness}'
         out_description = f'outputdescription-{uniqueness}'
-        
+
         # Create an output asset object
         out_asset = Asset(alternate_id=out_alternate_id, description=out_description)
-        
+
         # Create an output asset
         output_asset = await client.assets.create_or_update(resource_group, account_name, asset_name, out_asset)
-        
+
         if output_asset:
             # print output asset name
             print(f"The output asset name is: {output_asset.name}")
-            print() 
+            print()
         else:
             raise ValueError('Output Asset creation failed!')
 
-        # Create the Live Output - think of this as the "tape recorder for the live event". 
+        # Create the Live Output - think of this as the "tape recorder for the live event".
         # Live outputs are optional, but are required if you want to archive the event to storage,
         # use the asset for on-demand playback later, or if you want to enable cloud DVR time-shifting.
         # We will use the asset created above for the "tape" to record to.
@@ -252,10 +252,10 @@ async def main():
 
         # See the REST API for details on each of the settings on Live Output
         # https://docs.microsoft.com/rest/api/media/liveoutputs/create
-        
+
         print(f"Creating a live output named: {live_output_name}")
         print()
-        
+
         if output_asset:
             time_start = time.perf_counter()
             live_output_create = LiveOutput(
@@ -267,10 +267,10 @@ async def main():
                     fragments_per_ts_segment=1        # Advanced setting when using HLS TS output only.
                 )
             )
-            
+
             print(f"live_output_create object is {live_output_create}")
             print()
-            
+
             # Create and await the live output
             live_output_await = await client.live_outputs.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, live_output_name=live_output_name, parameters=live_output_create)
             if live_output_await:
@@ -283,7 +283,7 @@ async def main():
                 print()
             else:
                 raise Exception("Live Output creation failed!")
-        
+
         # Refresh the LiveEvent object's settings after starting it...
         live_event = await client.live_events.get(resource_group, account_name, live_event_name)
 
@@ -310,7 +310,7 @@ async def main():
             print("You will need to refresh the player page SEVERAL times until enough data has arrived to allow for manifest creation.")
             print("In a production player, the player can inspect the manifest to see if it contains enough content for the player to load and auto reload.")
             print()
-            
+
         print("Start the live stream now, sending the input to the ingest url and verify that it is arriving with the preview url.")
         print("IMPORTANT TIP!: Make CERTAIN that the video is flowing to the Preview URL before continuing!")
 
@@ -340,7 +340,7 @@ async def main():
             print("Streaming Endpoint started.")
             if not client_streaming_begin:
                 print("Streaming Endpoint was already started.")
-            
+
         # Get the URL to stream the Output
         print("The streaming URLs to stream the live output from a client player")
         print()
@@ -350,7 +350,7 @@ async def main():
 
         # If you wish to get the streaming manifest ahead of time, make sure to set the manifest name in the LiveOutput as done above.
         # This allows you to have a deterministic manifest path. <streaming endpoint hostname>/<streaming locator ID>/manifestName.ism/manifest(<format string>)
-        
+
         # Building the paths statically. Which is highly recommended when you want to share the stream manifests
         # to a player application or CMS system ahead of the live event.
         hls_format = "format=m3u8-cmaf"
@@ -364,20 +364,20 @@ async def main():
         print({hls_manifest})
         print()
 
-        dash_manifest = f'{manifest_base}({dash_format})'    
+        dash_manifest = f'{manifest_base}({dash_format})'
         print(f"The DASH manifest URL is: {dash_manifest}")
         print("Open the following URL to playback the live stream from the LiveOutput in the Azure Media Player")
         print(f"https://ampdemo.azureedge.net/?url={dash_manifest}&heuristicprofile=lowlatency")
         print()
-    
+
     # closing media client
     print('Closing media client')
     await client.close()
-    
+
     # closing credential client
     print('Closing credential client')
     await default_credential.close()
-        
+
 if __name__ == "__main__":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())

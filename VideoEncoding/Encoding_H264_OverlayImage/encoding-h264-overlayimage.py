@@ -35,13 +35,13 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
+# Get the environment variables
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
 account_name = os.getenv('ACCOUNTNAME')
 
 # The file you want to upload.  For this example, the file is placed under Media folder.
-# The file ignite.mp4 has been provided for you. 
+# The file ignite.mp4 has been provided for you.
 source_file_location = os.chdir("../../Media/")
 source_file = "ignite.mp4"
 
@@ -112,13 +112,13 @@ working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
 
-# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
-# Adjust the path as needed depending on how you are launching this python sample file. 
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder.
+# Adjust the path as needed depending on how you are launching this python sample file.
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
   blob_client.upload_blob(data)
-  
+
 ### Use the Storage SDK to upload the Overlay file
 print(f"Uploading the file {overlay_file}")
 
@@ -128,8 +128,8 @@ working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, overlay_file)
 
-# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
-# Adjust the path as needed depending on how you are launching this python sample file. 
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder.
+# Adjust the path as needed depending on how you are launching this python sample file.
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
@@ -149,7 +149,7 @@ transform_output = TransformOutput(
         sampling_rate=48000,
         bitrate=128000,
         profile=AacAudioProfile.AAC_LC
-      ), 
+      ),
       H264Video(
         key_frame_interval=timedelta(seconds=2),
         complexity=H264Complexity.BALANCED,
@@ -178,12 +178,12 @@ transform_output = TransformOutput(
         VideoOverlay(
           input_label=overlay_label,          # same label that is used in the JobInput to identify which file in the asset is the actual overlay image .png file.
           position=Rectangle(left="10%", top="10%"),       # left and top position of the overlay in absolute pixel or percentage relative to the source video resolution.
-          # You can also set the height and width of the rectangle to draw into, but there is known problem here. 
-          # If you use % for the top and left (or any of these) you have to stick with % for all or you will get a job configuration Error 
-          # Also, it can alter your aspect ratio when using percentages, so you have to know the source video size in relation to the source image to 
-          # provide the proper image size.  Recommendation is to just use the right size image for the source video here and avoid passing in height and width for now. 
+          # You can also set the height and width of the rectangle to draw into, but there is known problem here.
+          # If you use % for the top and left (or any of these) you have to stick with % for all or you will get a job configuration Error
+          # Also, it can alter your aspect ratio when using percentages, so you have to know the source video size in relation to the source image to
+          # provide the proper image size.  Recommendation is to just use the right size image for the source video here and avoid passing in height and width for now.
           # height: (if above is percentage based, this has to be also! Otherwise pixels are allowed. No mixing. )
-          # width: (if above is percentage based, this has to be also! Otherwise pixels are allowed No mixing. )              
+          # width: (if above is percentage based, this has to be also! Otherwise pixels are allowed No mixing. )
           opacity=0.75,                            # Sets the blending opacity value to make the image slightly transparent over the video
           start=timedelta(seconds=0),              # Start at beginning of the video
           fade_in_duration=timedelta(seconds=2),   # 2 second fade in
@@ -228,7 +228,7 @@ job_input_overlay = JobInputAsset(
 )
 
 # Create a list of job inputs - we will add both the video and overlay image assets here as the inputs to the job.
-job_inputs=[   
+job_inputs=[
     job_video_input_asset,
     job_input_overlay
 ]
@@ -248,11 +248,11 @@ print(job_state.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-    while t: 
-        mins, secs = divmod(t, 60) 
-        timer = '{:02d}:{:02d}'.format(mins, secs) 
-        print(timer, end="\r") 
-        time.sleep(1) 
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs)
+        print(timer, end="\r")
+        time.sleep(1)
         t -= 1
     job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
     if(job_current.state == "Finished"):

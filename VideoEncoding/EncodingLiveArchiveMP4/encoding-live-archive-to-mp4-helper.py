@@ -39,7 +39,7 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP and AZURE_MEDIA_SERVICES_ACCOUNT_NAME
+# Get the environment variables
 subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
 resource_group = os.getenv('AZURE_RESOURCE_GROUP')
 account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
@@ -55,8 +55,8 @@ mymodule.set_subscription_id(subscription_id)
 mymodule.create_default_azure_credential(default_credential)
 mymodule.create_azure_media_services(client)
 
-# The file you want to upload.  For this example, the file is placed under Media folder. 
-# The file ignite.mp4 has been provided for you. 
+# The file you want to upload.  For this example, the file is placed under Media folder.
+# The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
 name_prefix = "encode_copy_live"
 output_folder = "../../Output/"
@@ -64,7 +64,7 @@ output_folder = "../../Output/"
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = "mySampleRandomID" + str(random.randint(0,9999))
 
-# Set this to the name of the Asset used in your LiveOutput. This would be the archived live event Asset name. 
+# Set this to the name of the Asset used in your LiveOutput. This would be the archived live event Asset name.
 input_archive_name = "archiveAsset-3009"
 
 transform_name = 'CopyLiveArchiveToMP4'
@@ -90,8 +90,8 @@ async def main():
           Mp4Format(
             filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}"
           )
-        ]  
-      ), 
+        ]
+      ),
       # What should we do with the job if there is an error?
       on_error=OnErrorType.STOP_PROCESSING_JOB,
       # What is the relative priority of this job to others? Normal, high or low?
@@ -116,9 +116,9 @@ async def main():
       print()
     except:
       print("There was an error creating the transform.")
-    
+
     # Use this to select the top bitrate from the live archive asset
-    # The filter property allows you to select the "Top" bitrate which would be the 
+    # The filter property allows you to select the "Top" bitrate which would be the
     # highest bitrate provided by the live encoder.
     video_track_selection = SelectVideoTrackByAttribute(
       attribute=TrackAttribute.BITRATE,
@@ -136,32 +136,32 @@ async def main():
         )
       ]
     )
-    
+
     output_asset_name = f"{name_prefix}-output-{uniqueness}"
     job_name = f"{name_prefix}-job-{uniqueness}"
-    
+
     print(f"Creating the output asset (container) to encode the content into...")
     output_asset = await client.assets.create_or_update(resource_group, account_name, output_asset_name, {})
     if output_asset:
         print("Output Asset created.")
     else:
         print("There was a problem creating an output asset.")
-    
-    print() 
+
+    print()
     print(f"Submitting the encoding job to the {transform_name} job queue...")
     job = await mymodule.submit_job(transform_name, job_name, input, output_asset_name)
-    
+
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
-    
+
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-    
+
   # closing media client
   print('Closing media client')
   await client.close()
-    
+
   # closing credential client
   print('Closing credential client')
   await default_credential.close()

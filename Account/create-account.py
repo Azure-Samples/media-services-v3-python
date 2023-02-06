@@ -28,8 +28,8 @@ load_dotenv()
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # Get the environment variables SUBSCRIPTIONID and RESOURCEGROUP
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
