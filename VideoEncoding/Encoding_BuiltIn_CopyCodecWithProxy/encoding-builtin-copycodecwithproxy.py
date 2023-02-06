@@ -1,21 +1,21 @@
 # This sample shows how to use the built-in Copy codec preset that can take a source video file that is already encoded
 # using H264 and AAC audio, and copy it into MP4 tracks that are ready to be streamed by the AMS service.
-# In addition, this preset generates a fast proxy MP4 from the source video. 
+# In addition, this preset generates a fast proxy MP4 from the source video.
 # This is very helpful for scenarios where you want to make the uploaded MP4 asset available quickly for streaming, but also generate
 # allow quality proxy version of the asset for quick preview, video thumbnails, or low bitrate delivery while your application logic
-# decides if you need to backfill any more additional layers (540P, 360P, etc) to make the full adaptive bitrate set complete. 
-# This strategy is commonly used by services like YouTube to make content appear to be "instantly" available, but slowly fill in the 
+# decides if you need to backfill any more additional layers (540P, 360P, etc) to make the full adaptive bitrate set complete.
+# This strategy is commonly used by services like YouTube to make content appear to be "instantly" available, but slowly fill in the
 # quality levels for a more complete adaptive streaming experience. See the Encoding_BuiltIn_CopyCodec sample for a version that does not
-# generate the additional proxy layer. 
-# 
-# This is useful for scenarios where you have complete control over the source asset, and can encode it in a way that is 
+# generate the additional proxy layer.
+#
+# This is useful for scenarios where you have complete control over the source asset, and can encode it in a way that is
 # consistent with streaming (2-6 second GOP length, Constant Bitrate CBR encoding, no or limited B frames).
 # This preset should be capable of converting a source 1 hour video into a streaming MP4 format in under 1 minute, as it is not
-# doing any encoding - just re-packaging the content into MP4 files. 
+# doing any encoding - just re-packaging the content into MP4 files.
 #
 # NOTE: If the input has any B frames encoded, we occasionally can get the GOP boundaries that are off by 1 tick
 #       which can cause some issues with adaptive switching.
-#       This preset works up to 4K and 60fps content.   
+#       This preset works up to 4K and 60fps content.
 
 from importlib.resources import path
 from dotenv import load_dotenv
@@ -46,12 +46,12 @@ load_dotenv()
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-account_name = os.getenv('ACCOUNTNAME')
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # The file you want to upload.  For this example, the file is placed under Media folder.
-# The file ignite.mp4 has been provided for you. 
+# The file ignite.mp4 has been provided for you.
 source_file_location = os.chdir("../../Media/")
 source_file = "ignite.mp4"
 
@@ -102,8 +102,8 @@ working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
 
-# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
-# Adjust the path as needed depending on how you are launching this python sample file. 
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder.
+# Adjust the path as needed depending on how you are launching this python sample file.
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
@@ -117,9 +117,9 @@ print(f"Creating Built-in Standard CopyCodec with Proxy Encoding transform named
 # For this snippet, we are using 'BuiltInStandardEncoderPreset'
 transform_output = TransformOutput(
   preset=BuiltInStandardEncoderPreset(
-    # uses the built in SaaS copy codec preset, which copies source audio and video to MP4 tracks. 
+    # uses the built in SaaS copy codec preset, which copies source audio and video to MP4 tracks.
     # This also generates a fast proxy. See notes at top of this file on constraints and use case.
-    preset_name="saasProxyCopyCodec"   
+    preset_name="saasProxyCopyCodec"
   ),
   # What should we do with the job if there is an error?
   on_error=OnErrorType.STOP_PROCESSING_JOB,
@@ -163,11 +163,11 @@ print(job_state.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-  while t: 
-    mins, secs = divmod(t, 60) 
-    timer = '{:02d}:{:02d}'.format(mins, secs) 
-    print(timer, end="\r") 
-    time.sleep(1) 
+  while t:
+    mins, secs = divmod(t, 60)
+    timer = '{:02d}:{:02d}'.format(mins, secs)
+    print(timer, end="\r")
+    time.sleep(1)
     t -= 1
   job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
   if(job_current.state == "Finished"):
@@ -203,11 +203,11 @@ if output_asset is not None:
       account_name=account_name,
       streaming_endpoint_name="default"
     )
-    
+
     paths = client.streaming_locators.list_paths(
       resource_group_name=resource_group,
       account_name=account_name,
-      streaming_locator_name=locator_name 
+      streaming_locator_name=locator_name
     )
 
     if paths.streaming_paths:

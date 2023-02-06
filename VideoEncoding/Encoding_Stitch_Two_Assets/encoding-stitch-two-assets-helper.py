@@ -34,7 +34,7 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP and AZURE_MEDIA_SERVICES_ACCOUNT_NAME
+# Get the environment variables
 subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
 resource_group = os.getenv('AZURE_RESOURCE_GROUP')
 account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
@@ -51,8 +51,8 @@ mymodule.set_subscription_id(subscription_id)
 mymodule.create_default_azure_credential(default_credential)
 mymodule.create_azure_media_services(client)
 
-# The file you want to upload.  For this example, the file is placed under Media folder. 
-# The file ignite.mp4 has been provided for you. 
+# The file you want to upload.  For this example, the file is placed under Media folder.
+# The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
 bumper_file = "Azure_Bumper.mp4"
 name_prefix = "stitchTwoAssets"
@@ -106,11 +106,11 @@ async def main():
       print()
     except:
       print("There was an error creating the transform.")
-      
+
     # Asset names for main input and bumper input
     main_asset_name = f"main-{uniqueness}"
     bumper_asset_name = f"bumper-{uniqueness}"
-    
+
     try:
       # Create a new Asset and upload the 1st specified local video file into it. This is our video "bumper" to stitch to the front.
       main_input = await mymodule.create_input_asset(main_asset_name, source_file)   # This creates and uploads the main video file
@@ -119,7 +119,7 @@ async def main():
       bumper_input = await mymodule.create_input_asset(bumper_asset_name, bumper_file)     # This creates and uploads the second video file.
     except:
       raise ValueError("Error: Input assets were not created properly.")
-    
+
     # Create a Job Input Sequence with the two assets to stitch together
     # In this sample, we will stitch a bumper into the main video asset at the head, 6 seconds, and at the tail. We end the main video at 12s total.
     # TIMELINE :   | Bumper | Main video -----> 6 s | Bumper | Main Video 6s -----------> 12s | Bumper |s
@@ -165,10 +165,10 @@ async def main():
         )
       ]
     )
-    
+
     output_asset_name = f"{name_prefix}-output-{uniqueness}"
     job_name = f"{name_prefix}-job-{uniqueness}"
-    
+
     # Create the Output Asset for the Job to write final results to.
     print(f"Creating the output asset (container) to encode the content into...")
     output_asset = await client.assets.create_or_update(resource_group, account_name, output_asset_name, {})
@@ -176,22 +176,22 @@ async def main():
         print("Output Asset created.")
     else:
         print("There was a problem creating an output asset.")
-    
-    print() 
+
+    print()
     print(f"Submitting the encoding job to the {transform_name} job queue...")
     job = await mymodule.submit_job_with_input_sequence(transform_name, job_name, job_input_sequence, output_asset_name)
-    
+
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
-    
+
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-    
+
   # closing media client
   print('Closing media client')
   await client.close()
-    
+
   # closing credential client
   print('Closing credential client')
   await default_credential.close()

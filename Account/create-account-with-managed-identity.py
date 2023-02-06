@@ -1,12 +1,12 @@
 # There are three scenarios where Managed Identities can be used with Media Services:
-# 
+#
 # 1) Granting a Media Services account access to Key Vault to enable Customer Managed Keys
 # 2) Granting a Media Services account access to storage accounts to allow Media Services to bypass Azure Storage Network ACLs
 # 3) Allowing other services (for example, VMs or Azure Functions) to access Media Services
 #
-# This sample demonstrates creating an AMS account for scenario #2.  You can modify this sample to support scenario #1 as well, just uncomment the code sections required and provide the resource information for key vault. 
-# Scenario 3 would be handled through the Azure Portal or CLI. 
-# For more information read the article - https://docs.microsoft.com/azure/media-services/latest/concept-managed-identities 
+# This sample demonstrates creating an AMS account for scenario #2.  You can modify this sample to support scenario #1 as well, just uncomment the code sections required and provide the resource information for key vault.
+# Scenario 3 would be handled through the Azure Portal or CLI.
+# For more information read the article - https://docs.microsoft.com/azure/media-services/latest/concept-managed-identities
 
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
@@ -32,10 +32,10 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP, STORAGEACCOUNTNAME and AZURE_USER_ASSIGNED_IDENTITY
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-storage_account_name = os.getenv('STORAGEACCOUNTNAME')
+# Get the environment variables
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+storage_account_name = os.getenv('AZURE_STORAGE_ACCOUNT_NAME')
 managed_identity_name = os.getenv('AZURE_USER_ASSIGNED_IDENTITY')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
@@ -65,7 +65,7 @@ parameters = MediaService(
   location=account_location,
   storage_accounts=[
     StorageAccount(
-      # This should point to an already created storage account that is Blob storage General purpose v2. 
+      # This should point to an already created storage account that is Blob storage General purpose v2.
       # Recommend to use ZRS or Geo redundant ZRS in regions that support availability zones
       type=StorageAccountType.PRIMARY,
       id=f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Storage/storageAccounts/{storage_account_name}",
@@ -96,7 +96,7 @@ parameters = MediaService(
       "managed_identity_resource": {}
     }
   ),
-  # If you plan to use a private network and do not want any streaming to 
+  # If you plan to use a private network and do not want any streaming to
   # go out to the public internet, you can disable this account setting.
   public_network_access="Enabled",
   key_delivery=KeyDelivery(

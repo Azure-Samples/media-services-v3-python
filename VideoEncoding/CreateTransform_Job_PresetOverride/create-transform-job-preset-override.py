@@ -1,11 +1,11 @@
 # This sample demonstrates how to create an very simple Transform to use for submitting any custom Job into.
-# Creating a very basic transform in this fashion allows you to treat the AMS v3 API more like the legacy v2 API where 
-# transforms were not required, and you could submit any number of custom jobs to the same endpoint. 
+# Creating a very basic transform in this fashion allows you to treat the AMS v3 API more like the legacy v2 API where
+# transforms were not required, and you could submit any number of custom jobs to the same endpoint.
 # In the new v3 API, the default workflow is to create a transform "template" that holds a unique queue of jobs just for that
-# specific "recipe" of custom or pre-defined encoding. 
+# specific "recipe" of custom or pre-defined encoding.
 
 # In this sample, we show you how to create the blank empty Transform, and then submit a couple unique custom jobs to it,
-# overriding the blank empty Transform. 
+# overriding the blank empty Transform.
 
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -42,13 +42,13 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-account_name = os.getenv('ACCOUNTNAME')
+# Get the environment variables
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # The file you want to upload.  For this example, the file is placed under Media folder.
-# The file ignite.mp4 has been provided for you. 
+# The file ignite.mp4 has been provided for you.
 source_file_location = os.chdir("../../Media/")
 source_file = "ignite.mp4"
 
@@ -98,8 +98,8 @@ working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
 
-# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
-# Adjust the path as needed depending on how you are launching this python sample file. 
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder.
+# Adjust the path as needed depending on how you are launching this python sample file.
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
@@ -114,11 +114,11 @@ print(f"Creating empty, blank, Standard Encoding transform named: {transform_nam
 # Even though we define a single layer H264 preset here, we are going to override it later with a custom job level preset.
 # This allows you to treat this single Transform queue like the legacy v2 API, which only supported a single Job queue type.
 # In v3 API, the typical workflow that you will see in other samples is to create a transform "recipe" and submit jobs to it
-# that are all of the same type of output. 
-# Some customers need the flexibility to submit custom Jobs. 
+# that are all of the same type of output.
+# Some customers need the flexibility to submit custom Jobs.
 
 # First we create an mostly empty TransformOutput with a very basic H264 preset that we override later.
-# If a Job were submitted to this base Transform, the output would be a single MP4 video track at 1 Mbps. 
+# If a Job were submitted to this base Transform, the output would be a single MP4 video track at 1 Mbps.
 
 # For this snippet, we are using 'BuiltInStandardEncoderPreset'
 # Create a new Content Aware Encoding Preset using the Preset Configuration
@@ -184,7 +184,7 @@ standard_preset_h264 = StandardEncoderPreset(
                     label="HD-3600kbps"   # This label is used to modify the file name in the output formats
                 )
             ]
-        ), 
+        ),
         AacAudio(
             # Add an AAC Audio Layer for the audio encoding
             channels=2,
@@ -223,13 +223,13 @@ standard_preset_HEVC = StandardEncoderPreset(
                     label="HD-1800kbps" # This label is used to modify the file name in the output formats
                 )
             ]
-        ), 
+        ),
         AacAudio(
             # Add an AAC audio layer for the audio encoding
             channels=2,
             sampling_rate=48000,
             bitrate=128000,
-            profile=AacAudioProfile.AAC_LC    
+            profile=AacAudioProfile.AAC_LC
         )
     ],
     formats=[
@@ -265,11 +265,11 @@ print(job_state.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-    while t: 
-        mins, secs = divmod(t, 60) 
-        timer = '{:02d}:{:02d}'.format(mins, secs) 
-        print(timer, end="\r") 
-        time.sleep(1) 
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs)
+        print(timer, end="\r")
+        time.sleep(1)
         t -= 1
     job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
     if(job_current.state == "Finished"):
@@ -294,11 +294,11 @@ print(job_state2.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-    while t: 
-        mins, secs = divmod(t, 60) 
-        timer = '{:02d}:{:02d}'.format(mins, secs) 
-        print(timer, end="\r") 
-        time.sleep(1) 
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs)
+        print(timer, end="\r")
+        time.sleep(1)
         t -= 1
     job_current2 = client.jobs.get(resource_group, account_name, transform_name, job_name_hevc)
     if(job_current2.state == "Finished"):

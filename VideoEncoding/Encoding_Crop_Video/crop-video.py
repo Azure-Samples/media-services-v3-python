@@ -23,7 +23,7 @@ from azure.mgmt.media.models import (
   PngImage,
   Mp4Format,
   PngLayer,
-  PngFormat, 
+  PngFormat,
   AacAudioProfile,
   OnErrorType,
   Priority
@@ -43,11 +43,11 @@ load_dotenv()
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-account_name = os.getenv('ACCOUNTNAME')
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
-# The file you want to upload.  For this example, put the file in the same folder as this script. 
+# The file you want to upload.  For this example, put the file in the same folder as this script.
 # The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
 
@@ -106,8 +106,8 @@ working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
 
-# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
-# Adjust the path as needed depending on how you are launching this python sample file. 
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder.
+# Adjust the path as needed depending on how you are launching this python sample file.
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
@@ -150,7 +150,7 @@ transform_output = TransformOutput(
             width="1280",
             height="720"
           )
-        ],       
+        ],
       )
     ],
     # Specify the format for the output files - one for video+audio, and another for the thumbnails
@@ -219,11 +219,11 @@ print(job_state.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-  while t: 
-      mins, secs = divmod(t, 60) 
-      timer = '{:02d}:{:02d}'.format(mins, secs) 
-      print(timer, end="\r") 
-      time.sleep(1) 
+  while t:
+      mins, secs = divmod(t, 60)
+      timer = '{:02d}:{:02d}'.format(mins, secs)
+      print(timer, end="\r")
+      time.sleep(1)
       t -= 1
   job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
   if(job_current.state == "Finished"):

@@ -1,21 +1,21 @@
 # This sample shows how to use the built-in Copy codec preset that can take a source video file that is already encoded
 # using H264 and AAC audio, and copy it into MP4 tracks that are ready to be streamed by the AMS service.
-# In addition, this preset generates a fast proxy MP4 from the source video. 
+# In addition, this preset generates a fast proxy MP4 from the source video.
 # This is very helpful for scenarios where you want to make the uploaded MP4 asset available quickly for streaming, but also generate
 # a low quality proxy version of the asset for quick preview, video thumbnails, or low bitrate delivery while your application logic
-# decides if you need to backfill any more additional layers (540P, 360P, etc) to make the full adaptive bitrate set complete. 
-# This strategy is commonly used by services like YouTube to make content appear to be "instantly" available, but slowly fill in the 
+# decides if you need to backfill any more additional layers (540P, 360P, etc) to make the full adaptive bitrate set complete.
+# This strategy is commonly used by services like YouTube to make content appear to be "instantly" available, but slowly fill in the
 # quality levels for a more complete adaptive streaming experience. See the Encoding_BuiltIn_CopyCodec sample for a version that does not
-# generate the additional proxy layer. 
-# 
-# This is useful for scenarios where you have complete control over the source asset, and can encode it in a way that is 
+# generate the additional proxy layer.
+#
+# This is useful for scenarios where you have complete control over the source asset, and can encode it in a way that is
 # consistent with streaming (2-6 second GOP length, Constant Bitrate CBR encoding, no or limited B frames).
 # This preset should be capable of converting a source 1 hour video into a streaming MP4 format in under 1 minute, as it is not
-# doing any encoding - just re-packaging the content into MP4 files. 
+# doing any encoding - just re-packaging the content into MP4 files.
 #
 # NOTE: If the input has any B frames encoded, we occasionally can get the GOP boundaries that are off by 1 tick
 #       which can cause some issues with adaptive switching.
-#       This preset works up to 4K and 60fps content. 
+#       This preset works up to 4K and 60fps content.
 
 from importlib.resources import path
 from dotenv import load_dotenv
@@ -52,13 +52,13 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
-subscription_id = os.getenv('SUBSCRIPTIONID')
-resource_group = os.getenv('RESOURCEGROUP')
-account_name = os.getenv('ACCOUNTNAME')
+# Get the environment variables
+subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+resource_group = os.getenv('AZURE_RESOURCE_GROUP')
+account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # The file you want to upload.  For this example, the file is placed under Media folder.
-# The file ignite.mp4 has been provided for you. 
+# The file ignite.mp4 has been provided for you.
 source_file_location = os.chdir("../../Media/")
 source_file = "ignite.mp4"
 
@@ -108,8 +108,8 @@ working_dir = os.getcwd()
 print(f"Current working directory: {working_dir}")
 upload_file_path = os.path.join(working_dir, source_file)
 
-# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder. 
-# Adjust the path as needed depending on how you are launching this python sample file. 
+# WARNING: Depending on where you are launching the sample from, the path here could be off, and not include the BasicEncoding folder.
+# Adjust the path as needed depending on how you are launching this python sample file.
 
 # Upload the video to storage as a block blob
 with open(upload_file_path, "rb") as data:
@@ -125,12 +125,12 @@ transform_output = [
   TransformOutput(
     preset=BuiltInStandardEncoderPreset(
       preset_name="SaasSourceAligned360pOnly"       # There are some undocumented magical presets in our toolbox that do fun stuff - this one is going to copy the codecs from the source and also generate a 360p proxy file.
-      
+
       # Other magical presets to play around with, that might (or might not) work for your source video content...
       # "SaasCopyCodec" - this just copies the source video and audio into an MP4 ready for streaming.  The source has to be H264 and AAC with CBR encoding and no B frames typically.
       # "SaasProxyCopyCodec" - this copies the source video and audio into an MP4 ready for streaming and generates a proxy file.   The source has to be H264 and AAC with CBR encoding and no B frames typically.
-      # "SaasSourceAligned360pOnly" - same as above, but generates a single 360P proxy layer that is aligned in GOP to the source file. Useful for "back filling" a proxy on a pre-encoded file uploaded.  
-      # "SaasSourceAligned540pOnly"-  generates a single 540P proxy layer that is aligned in GOP to the source file. Useful for "back filling" a proxy on a pre-encoded file uploaded. 
+      # "SaasSourceAligned360pOnly" - same as above, but generates a single 360P proxy layer that is aligned in GOP to the source file. Useful for "back filling" a proxy on a pre-encoded file uploaded.
+      # "SaasSourceAligned540pOnly"-  generates a single 540P proxy layer that is aligned in GOP to the source file. Useful for "back filling" a proxy on a pre-encoded file uploaded.
       # "SaasSourceAligned540p" - generates an adaptive set of 540P and 360P that is aligned to the source file. used for "back filling" a pre-encoded or uploaded source file in an output asset for better streaming.
       # "SaasSourceAligned360p" - generates an adaptive set of 360P and 180P that is aligned to the source file. used for "back filling" a pre-encoded or uploaded source file in an output asset for better streaming.
     ),
@@ -144,14 +144,14 @@ transform_output = [
     preset=StandardEncoderPreset(
       # CopyVideo is a custom copy codec - it copies the source video track directly to the output MP4 file
       # CopyAudio is a custom copy codec - it copies the audio track from the source to the ouput MP4 file
-      # JpgImage - generates a set of thumbnails in one Jpg file (thumbnail sprite) 
+      # JpgImage - generates a set of thumbnails in one Jpg file (thumbnail sprite)
       codecs=[CopyVideo(), CopyAudio(), JpgImage(start="0%", step="5%", range="100%", sprite_column=10, layers=[JpgLayer(width="20%", height="20%", quality=85)])],
-      
+
       # Specify the format for the output files - one for video+audio, and another for the thumbnails
       # Mux the H.264 video and AAC audio into MP4 files, using basename, label, bitrate and extension macros
       # Note that since you have multiple H264Layers defined above, you have to use a macro that produces unique names per H264Layer
       # Either {Label} or {Bitrate} should suffice
-      formats=[Mp4Format(filename_pattern="CopyCodec-{Basename}{Extension}"), JpgFormat(filename_pattern="sprite-{Basename}-{Index}{Extension}")]  
+      formats=[Mp4Format(filename_pattern="CopyCodec-{Basename}{Extension}"), JpgFormat(filename_pattern="sprite-{Basename}-{Index}{Extension}")]
     ),
     # What should we do with the job if there is an error?
     on_error=OnErrorType.STOP_PROCESSING_JOB,
@@ -202,11 +202,11 @@ print(job_state.state)
 
 # Check the state of the job every 10 seconds. Adjust time_in_seconds = <how often you want to check for job state>
 def countdown(t):
-    while t: 
-        mins, secs = divmod(t, 60) 
-        timer = '{:02d}:{:02d}'.format(mins, secs) 
-        print(timer, end="\r") 
-        time.sleep(1) 
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs)
+        print(timer, end="\r")
+        time.sleep(1)
         t -= 1
     job_current = client.jobs.get(resource_group, account_name, transform_name, job_name)
     if(job_current.state == "Finished"):
@@ -246,7 +246,7 @@ if output_asset:
     paths = client.streaming_locators.list_paths(
       resource_group_name=resource_group,
       account_name=account_name,
-      streaming_locator_name=locator_name 
+      streaming_locator_name=locator_name
     )
 
     if paths.streaming_paths:
