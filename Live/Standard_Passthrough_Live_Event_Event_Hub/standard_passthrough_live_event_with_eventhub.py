@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 # Azure Media Services Live Streaming Sample for Python
 # This sample demonstrates how to enable Low Latency HLS (LL-HLS) streaming with encoding
 
@@ -53,8 +56,6 @@ from azure.mgmt.media.models import (
     LiveEventEncodingType,
     LiveEventInputProtocol,
     StreamOptionsFlag,
-    LiveEventTranscription,
-    LiveEventOutputTranscriptionTrack,
     Hls,
     StreamingLocator
 )
@@ -68,24 +69,25 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
+# Get the environment variables
 subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
 resource_group = os.getenv('AZURE_RESOURCE_GROUP')
 account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # Get the Event Hub Settings Configuration
 # Event Hubs connection information for processing Event Grid subscription events for Media Services
-eventhub_connection_string = os.getenv('EVENTHUBCONNECTIONSTRING')
-eventhub_name = os.getenv('EVENTHUBNAME')
-eventhub_namespace=os.getenv('EVENTHUBNAMESPACE')
-consumer_group=os.getenv('CONSUMERGROUP')
+eventhub_connection_string = os.getenv('EVENTHUB_CONNECTION_STRING')
+eventhub_name = os.getenv('EVENTHUB_NAME')
+eventhub_namespace=os.getenv('EVENTHUB_NAMESPACE')
+consumer_group=os.getenv('CONSUMER-GROUP-NAME')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
-live_event_name = f'liveEvent-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
-asset_name = f'archiveAsset-{uniqueness}'
-live_output_name = f'liveOutput-{uniqueness}'
-streaming_locator_name = f'liveStreamLocator-{uniqueness}'
+prefix = "stan-pass-ehub-live-event"
+live_event_name = f'{prefix}-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
+asset_name = f'{prefix}-archive-asset-{uniqueness}'
+live_output_name = f'{prefix}-live-output-{uniqueness}'
+streaming_locator_name = f'{prefix}-live-stream-locator-{uniqueness}'
 streaming_endpoint_name = 'default'     # Change this to your specific streaming endpoint name if not using "default"
 manifest_name = "output"
 
@@ -227,8 +229,8 @@ async def main():
         event_data_batch.add(EventData('Single Message'))
         await producer_client.send_batch(event_data_batch)
 
-        time_start=time.perf_counter()
         client_live = await client.live_events.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, parameters=live_event_create, auto_start=False)
+        time_start=time.perf_counter()
         time_end = time.perf_counter()
         execution_time = (time_end - time_start)
         if client_live:

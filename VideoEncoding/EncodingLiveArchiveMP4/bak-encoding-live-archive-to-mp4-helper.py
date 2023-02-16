@@ -1,5 +1,8 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
+# This sample shows how to copy a section of a live event archive (output from the LiveOutput) to an MP4 file for use in downstream applications
+# It is also useful to use this technique to get a file that you can submit to YouTube, Facebook, or other social platforms.
+# The output from this can also be submitted to the Video Indexer service, which currently does not support ingest of AMS live archives
+#
+# The key concept to know in this sample is the VideoTrackDescriptor that allows you to extract a specific bitrate from a live archive ABR set.
 
 import asyncio
 from datetime import timedelta
@@ -7,25 +10,28 @@ from dotenv import load_dotenv
 from azure.identity.aio import DefaultAzureCredential
 from azure.mgmt.media.aio import AzureMediaServices
 from azure.mgmt.media.models import (
+  Asset,
   Transform,
   TransformOutput,
   StandardEncoderPreset,
-  H264Layer,
-  AacAudio,
-  H264Video,
-  H264Complexity,
-  Filters,
+  CopyAudio,
+  CopyVideo,
   Mp4Format,
-  Rotation,
-  AacAudioProfile,
+  SelectVideoTrackByAttribute,
+  TrackAttribute,
+  AttributeFilter,
+  FromAllInputFile,
+  Job,
+  JobInputAsset,
+  JobOutputAsset,
   OnErrorType,
   Priority
-  )
+)
 import os, random
 
 # Import Job Helpers
 from importlib.machinery import SourceFileLoader
-mymodule = SourceFileLoader('encoding_job_helpers', 'Common/encoding_job_helpers.py').load_module()
+mymodule = SourceFileLoader('encoding_job_helpers', '../../Common/Encoding/encoding_job_helpers.py').load_module()
 
 # Get environment variables
 load_dotenv()
@@ -52,13 +58,16 @@ mymodule.create_azure_media_services(client)
 # The file you want to upload.  For this example, the file is placed under Media folder.
 # The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
-name_prefix = "encodeRotate90"
-output_folder = "Output/"
+name_prefix = "encode_copy_live"
+output_folder = "../../Output/"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
-uniqueness = str(random.randint(0,9999))
+uniqueness = "mySampleRandomID" + str(random.randint(0,9999))
 
-transform_name = 'H264EncodingRotate90'
+# Set this to the name of the Asset used in your LiveOutput. This would be the archived live event Asset name.
+input_archive_name = "archiveAsset-3009"
+
+transform_name = 'CopyLiveArchiveToMP4'
 
 async def main():
   async with client:
@@ -67,12 +76,21 @@ async def main():
 
     # For this snippet, we are using 'StandardEncoderPreset'
     transform_output = TransformOutput(
-      preset = StandardEncoderPreset(
-          codecs = [AacAudio(channels=2, sampling_rate=48000, bitrate=128000, profile=AacAudioProfile.AAC_LC),
-                    H264Video(key_frame_interval=timedelta(seconds=2), complexity=H264Complexity.BALANCED, layers=[H264Layer(bitrate=3600000, width="1280", height="720", label="HD-3600kbps")])],
-          # Specify the format for the output files - one for video + audio, and another for the thumbnails
-          formats = [Mp4Format(filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}")],
-          filters= Filters(rotation=Rotation.ROTATE90)      # Other options here include Auto rotation if the content contains metadata
+      preset=StandardEncoderPreset(
+        codecs=[
+          CopyAudio(),
+          CopyVideo()
+        ],
+        filters={},
+        # Specify the format for the output files - one for video+audio, and another for the thumbnails
+        formats=[
+          # Mux the H.264 video and AAC audio into MP4 files, using basename, label, bitrate and extension macros
+          # Note that since you have multiple H264Layers defined above, you have to use a macro that produces unique names per H264Layer
+          # Either {Label} or {Bitrate} should suffice
+          Mp4Format(
+            filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}"
+          )
+        ]
       ),
       # What should we do with the job if there is an error?
       on_error=OnErrorType.STOP_PROCESSING_JOB,
@@ -84,7 +102,7 @@ async def main():
 
     # Adding transform details
     my_transform = Transform()
-    my_transform.description="A simple custom H264 encoding transform that rotates the video 90 degrees"
+    my_transform.description="Built in preset using the Saas Copy Codec preset. This copies the source audio and video to an MP4 file"
     my_transform.outputs = [transform_output]
 
     print(f"Creating transform {transform_name}")
@@ -99,7 +117,26 @@ async def main():
     except:
       print("There was an error creating the transform.")
 
-    input = await mymodule.get_job_input_type(source_file, {}, name_prefix, uniqueness)
+    # Use this to select the top bitrate from the live archive asset
+    # The filter property allows you to select the "Top" bitrate which would be the
+    # highest bitrate provided by the live encoder.
+    video_track_selection = SelectVideoTrackByAttribute(
+      attribute=TrackAttribute.BITRATE,
+      filter=AttributeFilter.TOP    # Use this to select the top bitrate in this ABR asset for the job
+    )
+
+    # Create Job Input and Job Output Asset
+    input = JobInputAsset(
+      asset_name=input_archive_name,
+      input_definitions=[
+        FromAllInputFile(
+          included_tracks=[
+            video_track_selection   # Pass in the SelectVideoTrackByAttribute object created above to select only the top video.
+          ]
+        )
+      ]
+    )
+
     output_asset_name = f"{name_prefix}-output-{uniqueness}"
     job_name = f"{name_prefix}-job-{uniqueness}"
 
@@ -117,12 +154,9 @@ async def main():
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
 
-    # Uncomment the following lines to download the resulting files.
-    """
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-    """
 
   # closing media client
   print('Closing media client')

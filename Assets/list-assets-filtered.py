@@ -1,5 +1,5 @@
-# This sample demonstrates how to get the container name from any Asset. It can be in input or output asset from an encoding job.
-# Not that this sample also demonstrates how to name the container on creation.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
@@ -20,7 +20,7 @@ logger.setLevel(logging.DEBUG)
 load_dotenv()
 
 # For details on using the DefaultAzureCredential class, see https://learn.microsoft.com/python/api/overview/azure/identity-readme?view=azure-python#authenticate-with-defaultazurecredential
-default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=Trueexclude_shared_token_cache_credential=True,logging_enable=True)
+default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True,logging_enable=True)
 
 # Get the environment variables
 subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
@@ -34,13 +34,35 @@ uniqueness = random.randint(0,9999)
 print("Creating AMS Client")
 client = AzureMediaServices(default_credential, subscription_id, logging_enable=True)
 
-# List the Assets in Account
-print("Listing assets in account:")
+# List all the Assets in Account
+print("Listing all the assets in account:")
+for asset in client.assets.list(resource_group_name=resource_group, account_name=account_name):
+  print(asset.name)
+
+substr = "output"
+subtf = False
+
+# List assets by name string substring comparison
+for asset in client.assets.list(resource_group_name=resource_group, account_name=account_name):
+  if substr in asset.name:
+    subtf = True
+  else:
+    subtf = False
+if subtf == False:
+  print("No assets contain the substring.")
+else:
+  print("Listing assets by substring.")
+  for asset in client.assets.list(resource_group_name=resource_group, account_name=account_name):
+    if substr in asset.name:
+      print(asset.name)
 
 # For details on how to use filters, ordering and paging see the article https://docs.microsoft.com/azure/media-services/latest/filter-order-page-entities-how-to
 # Assets support filtering on name, alternateId, assetId, and created
+
+# Change MyCustomIdentifier to the alternate id of the asset you are looking for
 filter_odata = "properties/alternateId eq 'MyCustomIdentifier'"
 order_by = "properties/created desc"
 
 for asset in client.assets.list(resource_group_name=resource_group, account_name=account_name, filter=filter_odata, orderby=order_by):
-  print(asset.alternate_id)
+  print("Listing filtered assets:")
+  print(asset.name)

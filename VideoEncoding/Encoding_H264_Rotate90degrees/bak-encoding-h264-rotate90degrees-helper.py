@@ -1,6 +1,3 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 import asyncio
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -10,8 +7,13 @@ from azure.mgmt.media.models import (
   Transform,
   TransformOutput,
   StandardEncoderPreset,
+  H264Layer,
   AacAudio,
+  H264Video,
+  H264Complexity,
+  Filters,
   Mp4Format,
+  Rotation,
   AacAudioProfile,
   OnErrorType,
   Priority
@@ -20,7 +22,7 @@ import os, random
 
 # Import Job Helpers
 from importlib.machinery import SourceFileLoader
-mymodule = SourceFileLoader("encoding_job_helpers", "Common/encoding_job_helpers.py").load_module()
+mymodule = SourceFileLoader('encoding_job_helpers', '../../Common/Encoding/encoding_job_helpers.py').load_module()
 
 # Get environment variables
 load_dotenv()
@@ -37,7 +39,6 @@ account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 print("Creating AMS Client")
 client = AzureMediaServices(default_credential, subscription_id)
 
-
 # Send envs to helper function
 mymodule.set_account_name(account_name)
 mymodule.set_resource_group(resource_group)
@@ -48,13 +49,13 @@ mymodule.create_azure_media_services(client)
 # The file you want to upload.  For this example, the file is placed under Media folder.
 # The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
-name_prefix = "encodeAAC"
-output_folder = "Output/"
+name_prefix = "encodeRotate90"
+output_folder = "../../Output/"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
-uniqueness = str(random.randint(0,9999))
+uniqueness = "mySampleRandomID" + str(random.randint(0,9999))
 
-transform_name = 'AAC_LC_AudioOnly'
+transform_name = 'H264EncodingRotate90'
 
 async def main():
   async with client:
@@ -64,23 +65,11 @@ async def main():
     # For this snippet, we are using 'StandardEncoderPreset'
     transform_output = TransformOutput(
       preset = StandardEncoderPreset(
-        codecs = [
-          AacAudio(
-            channels=2,
-            sampling_rate=48000,
-            bitrate=128000,
-            profile=AacAudioProfile.AAC_LC,
-            label="aac-lc"
-          )
-        ],
-        # Specify the format for the output files - one for video+audio, and another for the thumbnails
-        formats = [
-          # Mux the AAC audio into MP4 files, using basename, label, bitrate and extension macros
-          # Either {Label} or {Bitrate} should suffice
-          Mp4Format(
-            filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}"
-          )
-        ]
+          codecs = [AacAudio(channels=2, sampling_rate=48000, bitrate=128000, profile=AacAudioProfile.AAC_LC),
+                    H264Video(key_frame_interval=timedelta(seconds=2), complexity=H264Complexity.BALANCED, layers=[H264Layer(bitrate=3600000, width="1280", height="720", label="HD-3600kbps")])],
+          # Specify the format for the output files - one for video + audio, and another for the thumbnails
+          formats = [Mp4Format(filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}")],
+          filters= Filters(rotation=Rotation.ROTATE90)      # Other options here include Auto rotation if the content contains metadata
       ),
       # What should we do with the job if there is an error?
       on_error=OnErrorType.STOP_PROCESSING_JOB,
@@ -92,7 +81,7 @@ async def main():
 
     # Adding transform details
     my_transform = Transform()
-    my_transform.description="A simple custom AAC LC only encoding transform"
+    my_transform.description="A simple custom H264 encoding transform that rotates the video 90 degrees"
     my_transform.outputs = [transform_output]
 
     print(f"Creating transform {transform_name}")
@@ -125,12 +114,9 @@ async def main():
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
 
-    # Uncomment the below to download the resulting files.
-    """
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-    """
 
   # closing media client
   print('Closing media client')

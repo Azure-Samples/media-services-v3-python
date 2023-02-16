@@ -1,6 +1,3 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 import asyncio
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -9,9 +6,16 @@ from azure.mgmt.media.aio import AzureMediaServices
 from azure.mgmt.media.models import (
   Transform,
   TransformOutput,
-  BuiltInStandardEncoderPreset,
-  PresetConfigurations,
-  InterleaveOutput,
+  StandardEncoderPreset,
+  H264Layer,
+  AacAudio,
+  H264Video,
+  H264Complexity,
+  PngImage,
+  Mp4Format,
+  PngLayer,
+  PngFormat,
+  AacAudioProfile,
   OnErrorType,
   Priority
   )
@@ -19,7 +23,7 @@ import os, random
 
 # Import Job Helpers
 from importlib.machinery import SourceFileLoader
-mymodule = SourceFileLoader("encoding_job_helpers", "Common/encoding_job_helpers.py").load_module()
+mymodule = SourceFileLoader('encoding_job_helpers', '../../Common/Encoding/encoding_job_helpers.py').load_module()
 
 # Get environment variables
 load_dotenv()
@@ -47,50 +51,39 @@ mymodule.create_azure_media_services(client)
 # The file you want to upload.  For this example, the file is placed under Media folder.
 # The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
-name_prefix = "contentAware264Constrained"
-output_folder = "Output/"
+name_prefix = "encodeAAC"
+output_folder = "../../Output/"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
-uniqueness = str(random.randint(0,9999))
+uniqueness = "mySampleRandomID" + str(random.randint(0,9999))
 
-transform_name = 'H264EncodingContentAwareConstrained'
+transform_name = 'AAC_LC_AudioOnly'
 
 async def main():
   async with client:
     # Create a new Standard encoding Transform for H264
     print(f"Creating Standard Encoding transform named: {transform_name}")
 
-    # This sample uses constraints on the CAE encoding preset to reduce the number of tracks output and resolutions to a specific range.
-    # First we will create a PresetConfigurations object to define the constraints that we want to use
-    # This allows you to configure the encoder settings to control the balance between speed and quality. Example: set Complexity as Speed for faster encoding but less compression efficiency.
-
-    presetConfig = PresetConfigurations(
-        complexity="Speed",
-        # The output includes both audio and video.
-        interleave_output=InterleaveOutput.INTERLEAVED_OUTPUT,
-        # The key frame interval in seconds. Example: set as 2 to reduce the playback buffering for some players.
-        key_frame_interval_in_seconds= 2,
-        # The maximum bitrate in bits per second (threshold for the top video layer). Example: set max_bitrate_bps as 6000000 to avoid producing very high bitrate outputs for contents with high complexity
-        max_bitrate_bps= 6000000,
-        # The minimum bitrate in bits per second (threshold for the bottom video layer). Example: set min_bitrate_bps as 200000 to have a bottom layer that covers users with low network bandwidth.
-        min_bitrate_bps= 200000,
-        #The maximum height of output video layers. Example: set max_height as 720 to produce output layers up to 720P even if the input is 4K.
-        max_height= 720,
-        # The minimum height of output video layers. Example: set min_height as 360 to avoid output layers of smaller resolutions like 180P.
-        min_height=270,
-        #  The maximum number of output video layers. Example: set max_layers as 4 to make sure at most 4 output layers are produced to control the overall cost of the encoding job.
-        max_layers=3
-    )
-
-    # From SDK
-    # TransformOutput(*, preset, on_error=None, relative_priority=None, **kwargs) -> None
-    # For this snippet, we are using 'BuiltInStandardEncoderPreset'
-
+    # For this snippet, we are using 'StandardEncoderPreset'
     transform_output = TransformOutput(
-      preset = BuiltInStandardEncoderPreset(
-        preset_name = "ContentAwareEncoding",
-        # Configurations can be used to control values used by the Content Aware Encoding Preset.
-        configurations = presetConfig
+      preset = StandardEncoderPreset(
+        codecs = [
+          AacAudio(
+            channels=2,
+            sampling_rate=48000,
+            bitrate=128000,
+            profile=AacAudioProfile.AAC_LC,
+            label="aac-lc"
+          )
+        ],
+        # Specify the format for the output files - one for video+audio, and another for the thumbnails
+        formats = [
+          # Mux the AAC audio into MP4 files, using basename, label, bitrate and extension macros
+          # Either {Label} or {Bitrate} should suffice
+          Mp4Format(
+            filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}"
+          )
+        ]
       ),
       # What should we do with the job if there is an error?
       on_error=OnErrorType.STOP_PROCESSING_JOB,
@@ -98,12 +91,11 @@ async def main():
       relative_priority=Priority.NORMAL
     )
 
-
     print("Creating encoding transform...")
 
     # Adding transform details
     my_transform = Transform()
-    my_transform.description="H264 content aware encoding with configuration settings"
+    my_transform.description="A simple custom AAC LC only encoding transform"
     my_transform.outputs = [transform_output]
 
     print(f"Creating transform {transform_name}")

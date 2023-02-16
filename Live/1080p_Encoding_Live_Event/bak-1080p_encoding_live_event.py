@@ -1,8 +1,4 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 # Azure Media Services Live Streaming Sample for Python
-# This sample demonstrates how to enable Low Latency HLS (LL-HLS) streaming with encoding
 
 # This sample assumes that you will use OBS Studio to broadcast RTMP
 # to the ingest endpoint. Please install OBS Studio first.
@@ -20,7 +16,7 @@
 # 1) Create the client for AMS using AAD service principal or managed ID
 # 2) Set up your IP restriction allow objects for ingest and preview
 # 3) Configure the Live Event object with your settings. Choose pass-through
-#   or encoding live event type and size (720p or 1080p)
+#   or encoding channel type and size (720p or 1080p)
 # 4) Create the Live Event without starting it
 # 5) Create an Asset to be used for recording the live stream into
 # 6) Create a Live Output, which acts as the "recorder" to record into the
@@ -39,8 +35,6 @@ from datetime import timedelta
 import time
 from dotenv import load_dotenv
 from azure.identity.aio import DefaultAzureCredential
-from azure.eventhub.aio import EventHubProducerClient
-from azure.eventhub import EventData, TransportType
 from azure.mgmt.media.aio import AzureMediaServices
 from azure.mgmt.media.models import (
     Asset,
@@ -56,6 +50,8 @@ from azure.mgmt.media.models import (
     LiveEventEncodingType,
     LiveEventInputProtocol,
     StreamOptionsFlag,
+    LiveEventTranscription,
+    LiveEventOutputTranscriptionTrack,
     Hls,
     StreamingLocator
 )
@@ -74,20 +70,12 @@ subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
 resource_group = os.getenv('AZURE_RESOURCE_GROUP')
 account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
-# Get the Event Hub Settings Configuration
-# Event Hubs connection information for processing Event Grid subscription events for Media Services
-eventhub_connection_string = os.getenv('EVENTHUB_CONNECTION_STRING')
-eventhub_name = os.getenv('EVENTHUB_NAME')
-eventhub_namespace=os.getenv('EVENTHUB_NAMESPACE')
-consumer_group=os.getenv('CONSUMER-GROUP-NAME')
-
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
-prefix = "stan-pass-ehub-live-event"
-live_event_name = f'{prefix}-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
-asset_name = f'{prefix}-archive-asset-{uniqueness}'
-live_output_name = f'{prefix}-live-output-{uniqueness}'
-streaming_locator_name = f'{prefix}-live-stream-locator-{uniqueness}'
+live_event_name = f'liveEvent-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
+asset_name = f'archiveAsset-{uniqueness}'
+live_output_name = f'liveOutput-{uniqueness}'
+streaming_locator_name = f'liveStreamLocator-{uniqueness}'
 streaming_endpoint_name = 'default'     # Change this to your specific streaming endpoint name if not using "default"
 manifest_name = "output"
 
@@ -95,10 +83,6 @@ print("Starting the Live Streaming sample for Azure Media Services")
 # The AMS Client
 print("Creating AMS Client")
 client = AzureMediaServices(default_credential, subscription_id)
-
-# The Event Hub Producer Client
-print("Creating Event Hub Producer Client")
-producer_client = EventHubProducerClient.from_connection_string(conn_str=eventhub_connection_string, eventhub_name=eventhub_name, transport_type=TransportType.AmqpOverWebsocket)
 
 # Creating the LiveEvent - the primary object for live streaming in AMS.
 # See the overview - https://docs.microsoft.com/azure/media-services/latest/live-streaming-overview
@@ -132,7 +116,6 @@ allow_all_input_range=IPRange(name="AllowAll", address="0.0.0.0", subnet_prefix_
 # live encoder, laptop, or device that is sending the live stream
 live_event_input_access=LiveEventInputAccessControl(ip=IPAccessControl(allow=[allow_all_input_range]))
 
-
 # Create the LiveEvent Preview IP access control object.
 # This will restrict which clients can view the preview endpoint
 # re-se the same range here for the sample, but in production, you can lock this to the IPs of your
@@ -149,7 +132,7 @@ live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl
 
 live_event_create=LiveEvent(
     location="West US 2",       # For the sample, we are using location: West US 2
-    description="Sample 720P Encoding Live Event from Python SDK sample",
+    description="Sample Live Event from Python SDK sample",
     # Set useStaticHostname to true to make the ingest and preview URL host name the same.
     # This can slow things down a bit.
     use_static_hostname=True,
@@ -167,7 +150,7 @@ live_event_create=LiveEvent(
         # Set this to Basic pass-through, Standard pass-through, Standard or Premium1080P to use the cloud live encoder.
         # See https://go.microsoft.com/fwlink/?linkid=2095101 for more information
         # Otherwise, leave as "None" to use pass-through mode
-        encoding_type=LiveEventEncodingType.PASSTHROUGH_STANDARD,
+        encoding_type=LiveEventEncodingType.PREMIUM1080_P,
         # OPTIONS for encoding type you can use:
         # encoding_type=LiveEventEncodingType.PassthroughBasic, # Basic pass-through mode - the cheapest option!
         # encoding_type=LiveEventEncodingType.PassthroughStandard, # also known as standard pass-through mode (formerly "none")
@@ -176,13 +159,6 @@ live_event_create=LiveEvent(
 
         # OPTIONS using live cloud encoding type:
         # key_frame_interval=timedelta(seconds = 2), # If this value is not set for an encoding live event, the fragment duration defaults to 2 seconds. The value cannot be set for pass-through live events.
-
-        # For Low Latency HLS Live streaming, there are two new custom presets available:
-        # "720p-3-Layer": For use with a Standard 720P encoding_type live event
-        # {"ElementaryStreams":[{"Type":"Video","BitRate":2500000,"Width":1280,"Height":720},{"Type":"Video","BitRate":1000000,"Width":960,"Height":540},{"Type":"Video","BitRate":400000,"Width":640,"Height":360}]}"
-        # "1080p-4-Layer":  For use with a Premium1080p encoding_type live event
-        # {"ElementaryStreams":[{"Type":"Video","BitRate":4500000,"Width":1920,"Height":1080},{"Type":"Video","BitRate":2200000,"Width":1280,"Height":720},{"Type":"Video","BitRate":1000000,"Width":960,"Height":540},{"Type":"Video","BitRate":400000,"Width":640,"Height":360}]}
-
         # preset_name=None, # only used for custom defined presets.
         # stretch_mode= None # can be used to determine stretch on encoder mode
     ),
@@ -191,7 +167,6 @@ live_event_create=LiveEvent(
     preview=live_event_preview,
 
     # 4) Set up more advanced options on the live event. Low Latency is the most common one.
-    # To enable Apple's Low Latency HLS (LL-HLS) streaming, you must use "LOW_LATENCY_V2" stream option
     stream_options=[StreamOptionsFlag.LOW_LATENCY]
 
     #5) Optionally, enable live transcriptions if desired.
@@ -224,13 +199,9 @@ print()
 # Returns a long running operation polling object that can be used to poll until completion.
 
 async def main():
-    async with client, producer_client:
-        event_data_batch = await producer_client.create_batch()
-        event_data_batch.add(EventData('Single Message'))
-        await producer_client.send_batch(event_data_batch)
-
-        client_live = await client.live_events.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, parameters=live_event_create, auto_start=False)
+    async with client:
         time_start=time.perf_counter()
+        client_live = await client.live_events.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, parameters=live_event_create, auto_start=False)
         time_end = time.perf_counter()
         execution_time = (time_end - time_start)
         if client_live:
@@ -257,8 +228,9 @@ async def main():
         output_asset = await client.assets.create_or_update(resource_group, account_name, asset_name, out_asset)
 
         if output_asset:
+            output_asset_name = output_asset.name
             # print output asset name
-            print(f"The output asset name is: {output_asset.name}")
+            print(f"The output asset name is: {output_asset_name}")
             print()
         else:
             raise ValueError('Output Asset creation failed!')
@@ -279,14 +251,13 @@ async def main():
             time_start = time.perf_counter()
             live_output_create = LiveOutput(
                 description="Optional description when using more than one live output",
-                asset_name=output_asset.name,
+                asset_name=output_asset_name,
                 manifest_name=manifest_name,      # The HLS and DASH manifest file name. This is recommended to set if you want a deterministic manifest path up front.
                 archive_window_length=timedelta(hours=1),     # Sets an one hour time-shift DVR window. Uses ISO 8601 format string.
                 hls=Hls(
                     fragments_per_ts_segment=1        # Advanced setting when using HLS TS output only.
                 )
             )
-
             print(f"live_output_create object is {live_output_create}")
             print()
 
@@ -317,7 +288,7 @@ async def main():
             print()
 
         if live_event.preview.endpoints:
-            # Use the preview_endpoint to preview and verify that the input from the encoder is actually being received.
+            # Use the preview_endpoint to preview and verify that the input from the encoder is actually being received
             # The preview endpoint URL also support the addition of various format strings for HLS (format=m3u8-cmaf) and DASH (format=mpd-time-cmaf) for example.
             # The default manifest is Smooth.
             preview_endpoint = live_event.preview.endpoints[0].url
@@ -391,10 +362,6 @@ async def main():
     # closing media client
     print('Closing media client')
     await client.close()
-
-    # closing eventhub producer client
-    print('Closing eventhub producer client')
-    await producer_client.close()
 
     # closing credential client
     print('Closing credential client')

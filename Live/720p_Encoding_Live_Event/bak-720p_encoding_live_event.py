@@ -1,6 +1,3 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 # Azure Media Services Live Streaming Sample for Python
 # This sample demonstrates how to enable Low Latency HLS (LL-HLS) streaming with encoding
 
@@ -54,6 +51,8 @@ from azure.mgmt.media.models import (
     LiveEventEncodingType,
     LiveEventInputProtocol,
     StreamOptionsFlag,
+    LiveEventTranscription,
+    LiveEventOutputTranscriptionTrack,
     Hls,
     StreamingLocator
 )
@@ -74,11 +73,10 @@ account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
-prefix = "basic-pass-live-event"
-live_event_name = f'{prefix}-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
-asset_name = f'{prefix}-archive-asset-{uniqueness}'
-live_output_name = f'{prefix}-live-output-{uniqueness}'
-streaming_locator_name = f'{prefix}-live-stream-locator-{uniqueness}'
+live_event_name = f'liveEvent-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
+asset_name = f'archiveAsset-{uniqueness}'
+live_output_name = f'liveOutput-{uniqueness}'
+streaming_locator_name = f'liveStreamLocator-{uniqueness}'
 streaming_endpoint_name = 'default'     # Change this to your specific streaming endpoint name if not using "default"
 manifest_name = "output"
 
@@ -122,7 +120,7 @@ live_event_input_access=LiveEventInputAccessControl(ip=IPAccessControl(allow=[al
 
 # Create the LiveEvent Preview IP access control object.
 # This will restrict which clients can view the preview endpoint
-# re-se the same range here for the sample, but in production, you can lock this to the IPs of your
+# re-use the same range here for the sample, but in production, you can lock this to the IPs of your
 # devices that would be monitoring the live preview.
 live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl(ip=IPAccessControl(allow=[allow_all_input_range])))
 
@@ -135,9 +133,7 @@ live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl
 # https://docs.microsoft.com/rest/api/media/liveevents/create
 
 live_event_create=LiveEvent(
-    # NOTE: Make sure that your live stream is located in the same region as your Media Services account.
-    # Otherwise, a Resource Not Found error for your AMS account will be thrown.
-    location="West US",       # For the sample, we are using location: West US 2
+    location="West US 2",       # For the sample, we are using location: West US 2
     description="Sample 720P Encoding Live Event from Python SDK sample",
     # Set useStaticHostname to true to make the ingest and preview URL host name the same.
     # This can slow things down a bit.
@@ -148,7 +144,7 @@ live_event_create=LiveEvent(
         streaming_protocol=LiveEventInputProtocol.RTMP,     # Options are RTMP or Smooth Streaming ingest format.
         access_control=live_event_input_access,     # controls the IP restriction for the source header
         # key_frame_interval_duration = timedelta(seconds = 2),       # Set this to match the ingest encoder's settings. This should not be used for encoding channels
-        access_token='9eb1f703b149417c8448771867f48501'       # Use this value when you want to make sure the ingest URL is static and always the same. If omitted, the service will generate a random GUID values.
+        access_token='9eb1f703b149417c8448771867f48501'       # Use this value when you want to make sure the ingest URL is static and always the same. If omited, the service will generate a random GUID values.
     ),
 
     # 2) Set the live event to use pass-through or cloud encoding modes...
@@ -156,7 +152,7 @@ live_event_create=LiveEvent(
         # Set this to Basic pass-through, Standard pass-through, Standard or Premium1080P to use the cloud live encoder.
         # See https://go.microsoft.com/fwlink/?linkid=2095101 for more information
         # Otherwise, leave as "None" to use pass-through mode
-        encoding_type=LiveEventEncodingType.PASSTHROUGH_BASIC,
+        encoding_type=LiveEventEncodingType.STANDARD,
         # OPTIONS for encoding type you can use:
         # encoding_type=LiveEventEncodingType.PassthroughBasic, # Basic pass-through mode - the cheapest option!
         # encoding_type=LiveEventEncodingType.PassthroughStandard, # also known as standard pass-through mode (formerly "none")
@@ -214,8 +210,8 @@ print()
 
 async def main():
     async with client:
-        client_live = await client.live_events.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, parameters=live_event_create, auto_start=True)
-        time_start = time.perf_counter()
+        time_start=time.perf_counter()
+        client_live = await client.live_events.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, parameters=live_event_create, auto_start=False)
         time_end = time.perf_counter()
         execution_time = (time_end - time_start)
         if client_live:
@@ -296,7 +292,6 @@ async def main():
         # to get the primary secure RTMPS, it is usually going to be index 3, but you could add a loop here to confirm...
         if live_event.input.endpoints:
             ingest_url = live_event.input.endpoints[0].url
-
             print("The RTMP ingest URL to enter into OBS Studio is:")
             print(f"RTMP ingest: {ingest_url}")
             print("Make sure to enter a Stream Key into the OBS studio settings. It can be any value or you can repeat the accessToken used in the ingest URL path.")
@@ -308,7 +303,6 @@ async def main():
             # The preview endpoint URL also support the addition of various format strings for HLS (format=m3u8-cmaf) and DASH (format=mpd-time-cmaf) for example.
             # The default manifest is Smooth.
             preview_endpoint = live_event.preview.endpoints[0].url
-
             print(f"The preview url is: {preview_endpoint}")
             print()
             print("Open the live preview in your browser and use any DASH and HLS player to monitor the preview playback.")
@@ -317,12 +311,10 @@ async def main():
             print("In a production player, the player can inspect the manifest to see if it contains enough content for the player to load and auto reload.")
             print()
 
-
         print("Start the live stream now, sending the input to the ingest url and verify that it is arriving with the preview url.")
         print("IMPORTANT TIP!: Make CERTAIN that the video is flowing to the Preview URL before continuing!")
 
         # Create the Streaming Locator URL for playback of the contents in the Live Output recoding
-
         print(f"Creating a streaming locator named: {streaming_locator_name}")
         print()
         streaming_locator = StreamingLocator(asset_name=asset_name, streaming_policy_name="Predefined_ClearStreamingOnly")

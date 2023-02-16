@@ -1,6 +1,3 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 import asyncio
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -10,23 +7,23 @@ from azure.mgmt.media.models import (
   Transform,
   TransformOutput,
   StandardEncoderPreset,
+  H264Layer,
   AacAudio,
-  AacAudioProfile,
   H264Video,
   H264Complexity,
-  H264Layer,
-  JpgImage,
-  JpgLayer,
+  PngImage,
   Mp4Format,
-  JpgFormat,
+  PngLayer,
+  PngFormat,
+  AacAudioProfile,
   OnErrorType,
   Priority
-)
+  )
 import os, random
 
 # Import Job Helpers
 from importlib.machinery import SourceFileLoader
-mymodule = SourceFileLoader('encoding_job_helpers', 'Common/encoding_job_helpers.py').load_module()
+mymodule = SourceFileLoader('encoding_job_helpers', '../../Common/Encoding/encoding_job_helpers.py').load_module()
 
 # Get environment variables
 load_dotenv()
@@ -43,7 +40,6 @@ account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 print("Creating AMS Client")
 client = AzureMediaServices(default_credential, subscription_id)
 
-
 # Send envs to helper function
 mymodule.set_account_name(account_name)
 mymodule.set_resource_group(resource_group)
@@ -54,13 +50,13 @@ mymodule.create_azure_media_services(client)
 # The file you want to upload.  For this example, the file is placed under Media folder.
 # The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
-name_prefix = "encodeSpriteThumb"
-output_folder = "Output/"
+name_prefix = "encodeH264"
+output_folder = "../../Output/"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = "mySampleRandomID" + str(random.randint(0,9999))
 
-transform_name = 'SpriteThumbnail'
+transform_name = 'H264Encoding'
 
 async def main():
   async with client:
@@ -69,27 +65,68 @@ async def main():
 
     # For this snippet, we are using 'StandardEncoderPreset'
     transform_output = TransformOutput(
-      preset = StandardEncoderPreset(
-        codecs = [AacAudio(channels = 2, sampling_rate = 48000, bitrate = 128000, profile = AacAudioProfile.AAC_LC),
-                  H264Video(key_frame_interval = timedelta(seconds = 2), complexity = H264Complexity.SPEED, layers = [H264Layer(bitrate=3600000, width="1280", height="720", label="HD-3600kbps")]),
-                  JpgImage(
-                    # Also generate a set of thumbnails in one Jpg file (thumbnail sprite)
-                    start="0%",
-                    step="5%",
-                    range="100%",
-                    sprite_column=10,   # Key is to set the column number here, and then set the width and height of the layer
-                    layers= [
-                      JpgLayer(width="20%", height="20%", quality=85)
-                    ]
-                  )
+      preset=StandardEncoderPreset(
+        codecs=[
+          AacAudio(
+            channels=2,
+            sampling_rate=48000,
+            bitrate=128000,
+            profile=AacAudioProfile.AAC_LC
+          ),
+          H264Video(
+            key_frame_interval=timedelta(seconds=2),
+            complexity=H264Complexity.BALANCED,
+            layers=[
+              H264Layer(
+                bitrate=3600000,   # Units are in bits per second and not kbps or Mbps - 3.6Mbps or 3,600 kbps
+                width=1200,
+                height=720,
+                buffer_window=timedelta(seconds=5),
+                profile="Auto",
+                label="HD-3600kbps"   # This label is used to modify the file name in the output formats
+              ),
+              H264Layer(
+                bitrate=1600000,   # Units are in bits per second and not kbps or Mbps - 3.6Mbps or 3,600 kbps
+                width= 960,
+                height=540,
+                buffer_window=timedelta(seconds=5),
+                profile="Auto",
+                label="SD-1600kbps"   # This label is used to modify the file name in the output formats
+              ),
+              H264Layer(
+                bitrate=600000,   # Units are in bits per second and not kbps or Mbps - 3.6Mbps or 3,600 kbps
+                width=640,
+                height=480,
+                buffer_window=timedelta(seconds=5),
+                profile="Auto",
+                label="SD-600kbps"   # This label is used to modify the file name in the output formats
+              )
+            ],
+          ),
+          PngImage(
+            # Also generate a set of PNG thumbnails
+            start="25%",
+            step="25%",
+            range="25%",
+            layers=[
+              PngLayer(
+                width="50%",
+                height="50%"
+              )
+            ]
+          )
         ],
         # Specify the format for the output files - one for video+audio, and another for the thumbnails
         formats = [
           # Mux the H.264 video and AAC audio into MP4 files, using basename, label, bitrate and extension macros
           # Note that since you have multiple H264Layers defined above, you have to use a macro that produces unique names per H264Layer
           # Either {Label} or {Bitrate} should suffice
-          Mp4Format(filename_pattern = "Video-{Basename}-{Label}-{Bitrate}{Extension}"),
-          JpgFormat(filename_pattern = "sprite-{Basename}-{Index}{Extension}")
+          Mp4Format(
+            filename_pattern="Video-{Basename}-{Label}-{Bitrate}{Extension}"
+          ),
+          PngFormat(
+            filename_pattern="Thumbnail-{Basename}-{Index}{Extension}"
+          )
         ]
       ),
       # What should we do with the job if there is an error?
@@ -102,7 +139,7 @@ async def main():
 
     # Adding transform details
     my_transform = Transform()
-    my_transform.description="Generates a sprite thumbnail (VTT) and a speed encoding of 720P layer of H264 with AAC audio"
+    my_transform.description="A simple custom H264 encoding transform with 3 MP4 bitrates"
     my_transform.outputs = [transform_output]
 
     print(f"Creating transform {transform_name}")
@@ -135,12 +172,9 @@ async def main():
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
 
-    # Uncomment the following lines to download the resulting files.
-    """
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-    """
 
   # closing media client
   print('Closing media client')

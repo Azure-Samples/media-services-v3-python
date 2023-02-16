@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 # Azure Media Services Live Streaming Sample for Python
 
 # This sample assumes that you will use OBS Studio to broadcast RTMP
@@ -50,8 +53,6 @@ from azure.mgmt.media.models import (
     LiveEventEncodingType,
     LiveEventInputProtocol,
     StreamOptionsFlag,
-    LiveEventTranscription,
-    LiveEventOutputTranscriptionTrack,
     Hls,
     StreamingLocator
 )
@@ -72,10 +73,11 @@ account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
-live_event_name = f'liveEvent-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
-asset_name = f'archiveAsset-{uniqueness}'
-live_output_name = f'liveOutput-{uniqueness}'
-streaming_locator_name = f'liveStreamLocator-{uniqueness}'
+prefix = "1080p-live-event"
+live_event_name = f'{prefix}-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
+asset_name = f'{prefix}-archive-asset-{uniqueness}'
+live_output_name = f'{prefix}-live-output-{uniqueness}'
+streaming_locator_name = f'{prefix}-live-stream-locator-{uniqueness}'
 streaming_endpoint_name = 'default'     # Change this to your specific streaming endpoint name if not using "default"
 manifest_name = "output"
 
@@ -131,7 +133,9 @@ live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl
 # https://docs.microsoft.com/rest/api/media/liveevents/create
 
 live_event_create=LiveEvent(
-    location="West US 2",       # For the sample, we are using location: West US 2
+    # NOTE: Make sure that your live stream is located in the same region as your Media Services account.
+    # Otherwise, a Resource Not Found error for your AMS account will be thrown.
+    location="West US",       # For the sample, we are using location: West US 2
     description="Sample Live Event from Python SDK sample",
     # Set useStaticHostname to true to make the ingest and preview URL host name the same.
     # This can slow things down a bit.

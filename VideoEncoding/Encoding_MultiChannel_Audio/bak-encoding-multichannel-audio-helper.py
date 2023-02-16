@@ -1,6 +1,3 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 import asyncio
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -18,6 +15,9 @@ from azure.mgmt.media.models import (
   AacAudioProfile,
   Mp4Format,
   OutputFile,
+  Job,
+  JobInputAsset,
+  JobOutputAsset,
   OnErrorType,
   Priority
   )
@@ -25,10 +25,11 @@ import os, random
 
 # Import Job Helpers
 from importlib.machinery import SourceFileLoader
-mymodule = SourceFileLoader('encoding_job_helpers', 'Common/encoding_job_helpers.py').load_module()
+mymodule = SourceFileLoader('encoding_job_helpers', '../../Common/Encoding/encoding_job_helpers.py').load_module()
 
 # Get environment variables
 load_dotenv()
+
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
@@ -52,10 +53,10 @@ mymodule.create_azure_media_services(client)
 # Provide a sample file with 8 discrete audio tracks as layout is defined above. Path is relative to the working directory for Python
 source_file = "surround-audio.mp4"
 name_prefix = "encodeH264_multi_channel"
-output_folder = "Output/"
+output_folder = "../../Output/"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
-uniqueness = str(random.randint(0,9999))
+uniqueness = "mySampleRandomID" + str(random.randint(0,9999))
 
 transform_name = 'Custom_AAC_MultiChannel_Surround'
 
@@ -154,12 +155,9 @@ async def main():
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
 
-    # Uncomment the following lines to download the resulting files.
-    """
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-    """
 
   # closing media client
   print('Closing media client')

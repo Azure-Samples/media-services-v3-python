@@ -1,6 +1,3 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 # Azure Media Services Live Streaming Sample for Python
 # This sample demonstrates how to enable Low Latency HLS (LL-HLS) streaming with encoding
 
@@ -20,7 +17,7 @@
 # 1) Create the client for AMS using AAD service principal or managed ID
 # 2) Set up your IP restriction allow objects for ingest and preview
 # 3) Configure the Live Event object with your settings. Choose pass-through
-#   or encoding channel type and size (720p or 1080p)
+#   or encoding live event type and size (720p or 1080p)
 # 4) Create the Live Event without starting it
 # 5) Create an Asset to be used for recording the live stream into
 # 6) Create a Live Output, which acts as the "recorder" to record into the
@@ -39,6 +36,8 @@ from datetime import timedelta
 import time
 from dotenv import load_dotenv
 from azure.identity.aio import DefaultAzureCredential
+from azure.eventhub.aio import EventHubProducerClient
+from azure.eventhub import EventData, TransportType
 from azure.mgmt.media.aio import AzureMediaServices
 from azure.mgmt.media.models import (
     Asset,
@@ -54,6 +53,8 @@ from azure.mgmt.media.models import (
     LiveEventEncodingType,
     LiveEventInputProtocol,
     StreamOptionsFlag,
+    LiveEventTranscription,
+    LiveEventOutputTranscriptionTrack,
     Hls,
     StreamingLocator
 )
@@ -67,18 +68,24 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables
+# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP and ACCOUNTNAME
 subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
 resource_group = os.getenv('AZURE_RESOURCE_GROUP')
 account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
+# Get the Event Hub Settings Configuration
+# Event Hubs connection information for processing Event Grid subscription events for Media Services
+eventhub_connection_string = os.getenv('EVENTHUBCONNECTIONSTRING')
+eventhub_name = os.getenv('EVENTHUBNAME')
+eventhub_namespace=os.getenv('EVENTHUBNAMESPACE')
+consumer_group=os.getenv('CONSUMERGROUP')
+
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
-prefix = "720p-live-event"
-live_event_name = f'{prefix}-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
-asset_name = f'{prefix}-archive-asset-{uniqueness}'
-live_output_name = f'{prefix}-live-output-{uniqueness}'
-streaming_locator_name = f'{prefix}-live-stream-locator-{uniqueness}'
+live_event_name = f'liveEvent-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
+asset_name = f'archiveAsset-{uniqueness}'
+live_output_name = f'liveOutput-{uniqueness}'
+streaming_locator_name = f'liveStreamLocator-{uniqueness}'
 streaming_endpoint_name = 'default'     # Change this to your specific streaming endpoint name if not using "default"
 manifest_name = "output"
 
@@ -86,6 +93,10 @@ print("Starting the Live Streaming sample for Azure Media Services")
 # The AMS Client
 print("Creating AMS Client")
 client = AzureMediaServices(default_credential, subscription_id)
+
+# The Event Hub Producer Client
+print("Creating Event Hub Producer Client")
+producer_client = EventHubProducerClient.from_connection_string(conn_str=eventhub_connection_string, eventhub_name=eventhub_name, transport_type=TransportType.AmqpOverWebsocket)
 
 # Creating the LiveEvent - the primary object for live streaming in AMS.
 # See the overview - https://docs.microsoft.com/azure/media-services/latest/live-streaming-overview
@@ -122,7 +133,7 @@ live_event_input_access=LiveEventInputAccessControl(ip=IPAccessControl(allow=[al
 
 # Create the LiveEvent Preview IP access control object.
 # This will restrict which clients can view the preview endpoint
-# re-use the same range here for the sample, but in production, you can lock this to the IPs of your
+# re-se the same range here for the sample, but in production, you can lock this to the IPs of your
 # devices that would be monitoring the live preview.
 live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl(ip=IPAccessControl(allow=[allow_all_input_range])))
 
@@ -135,8 +146,6 @@ live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl
 # https://docs.microsoft.com/rest/api/media/liveevents/create
 
 live_event_create=LiveEvent(
-    # NOTE: Make sure that your live stream is located in the same region as your Media Services account.
-    # Otherwise, a Resource Not Found error for your AMS account will be thrown.
     location="West US 2",       # For the sample, we are using location: West US 2
     description="Sample 720P Encoding Live Event from Python SDK sample",
     # Set useStaticHostname to true to make the ingest and preview URL host name the same.
@@ -148,7 +157,7 @@ live_event_create=LiveEvent(
         streaming_protocol=LiveEventInputProtocol.RTMP,     # Options are RTMP or Smooth Streaming ingest format.
         access_control=live_event_input_access,     # controls the IP restriction for the source header
         # key_frame_interval_duration = timedelta(seconds = 2),       # Set this to match the ingest encoder's settings. This should not be used for encoding channels
-        access_token='9eb1f703b149417c8448771867f48501'       # Use this value when you want to make sure the ingest URL is static and always the same. If omitted, the service will generate a random GUID values.
+        access_token='9eb1f703b149417c8448771867f48501'       # Use this value when you want to make sure the ingest URL is static and always the same. If omited, the service will generate a random GUID values.
     ),
 
     # 2) Set the live event to use pass-through or cloud encoding modes...
@@ -156,7 +165,7 @@ live_event_create=LiveEvent(
         # Set this to Basic pass-through, Standard pass-through, Standard or Premium1080P to use the cloud live encoder.
         # See https://go.microsoft.com/fwlink/?linkid=2095101 for more information
         # Otherwise, leave as "None" to use pass-through mode
-        encoding_type=LiveEventEncodingType.STANDARD,
+        encoding_type=LiveEventEncodingType.PASSTHROUGH_STANDARD,
         # OPTIONS for encoding type you can use:
         # encoding_type=LiveEventEncodingType.PassthroughBasic, # Basic pass-through mode - the cheapest option!
         # encoding_type=LiveEventEncodingType.PassthroughStandard, # also known as standard pass-through mode (formerly "none")
@@ -213,9 +222,13 @@ print()
 # Returns a long running operation polling object that can be used to poll until completion.
 
 async def main():
-    async with client:
-        client_live = await client.live_events.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, parameters=live_event_create, auto_start=True)
+    async with client, producer_client:
+        event_data_batch = await producer_client.create_batch()
+        event_data_batch.add(EventData('Single Message'))
+        await producer_client.send_batch(event_data_batch)
+
         time_start=time.perf_counter()
+        client_live = await client.live_events.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, parameters=live_event_create, auto_start=False)
         time_end = time.perf_counter()
         execution_time = (time_end - time_start)
         if client_live:
@@ -302,8 +315,7 @@ async def main():
             print()
 
         if live_event.preview.endpoints:
-            # Use the preview_endpoint to preview and verify
-            # that the input from the encoder is actually being received
+            # Use the preview_endpoint to preview and verify that the input from the encoder is actually being received.
             # The preview endpoint URL also support the addition of various format strings for HLS (format=m3u8-cmaf) and DASH (format=mpd-time-cmaf) for example.
             # The default manifest is Smooth.
             preview_endpoint = live_event.preview.endpoints[0].url
@@ -377,6 +389,10 @@ async def main():
     # closing media client
     print('Closing media client')
     await client.close()
+
+    # closing eventhub producer client
+    print('Closing eventhub producer client')
+    await producer_client.close()
 
     # closing credential client
     print('Closing credential client')

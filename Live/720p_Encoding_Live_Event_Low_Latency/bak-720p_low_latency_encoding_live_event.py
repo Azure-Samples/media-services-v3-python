@@ -1,7 +1,5 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 # Azure Media Services Live Streaming Sample for Python
+# This sample demonstrates how to enable Low Latency HLS (LL-HLS) streaming with encoding
 
 # This sample assumes that you will use OBS Studio to broadcast RTMP
 # to the ingest endpoint. Please install OBS Studio first.
@@ -37,8 +35,8 @@ import asyncio
 from datetime import timedelta
 import time
 from dotenv import load_dotenv
-from azure.identity.aio import DefaultAzureCredential
-from azure.mgmt.media.aio import AzureMediaServices
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.media import AzureMediaServices
 from azure.mgmt.media.models import (
     Asset,
     IPRange,
@@ -53,6 +51,8 @@ from azure.mgmt.media.models import (
     LiveEventEncodingType,
     LiveEventInputProtocol,
     StreamOptionsFlag,
+    LiveEventTranscription,
+    LiveEventOutputTranscriptionTrack,
     Hls,
     StreamingLocator
 )
@@ -73,11 +73,10 @@ account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
-prefix = "1080p-live-event"
-live_event_name = f'{prefix}-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
-asset_name = f'{prefix}-archive-asset-{uniqueness}'
-live_output_name = f'{prefix}-live-output-{uniqueness}'
-streaming_locator_name = f'{prefix}-live-stream-locator-{uniqueness}'
+live_event_name = f'liveEvent-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
+asset_name = f'archiveAsset-{uniqueness}'
+live_output_name = f'liveOutput-{uniqueness}'
+streaming_locator_name = f'liveStreamLocator-{uniqueness}'
 streaming_endpoint_name = 'default'     # Change this to your specific streaming endpoint name if not using "default"
 manifest_name = "output"
 
@@ -117,10 +116,9 @@ allow_all_input_range=IPRange(name="AllowAll", address="0.0.0.0", subnet_prefix_
 # re-use the same range here for the sample, but in production, you can lock this down to the IP range for your on-premises
 # live encoder, laptop, or device that is sending the live stream
 live_event_input_access=LiveEventInputAccessControl(ip=IPAccessControl(allow=[allow_all_input_range]))
-
 # Create the LiveEvent Preview IP access control object.
 # This will restrict which clients can view the preview endpoint
-# re-se the same range here for the sample, but in production, you can lock this to the IPs of your
+# re-use the same range here for the sample, but in production, you can lock this to the IPs of your
 # devices that would be monitoring the live preview.
 live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl(ip=IPAccessControl(allow=[allow_all_input_range])))
 
@@ -133,10 +131,8 @@ live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl
 # https://docs.microsoft.com/rest/api/media/liveevents/create
 
 live_event_create=LiveEvent(
-    # NOTE: Make sure that your live stream is located in the same region as your Media Services account.
-    # Otherwise, a Resource Not Found error for your AMS account will be thrown.
-    location="West US",       # For the sample, we are using location: West US 2
-    description="Sample Live Event from Python SDK sample",
+    location="West US 2",       # For the sample, we are using location: West US 2
+    description="Sample 720P Low Latency Encoding Live Event from Python SDK sample",
     # Set useStaticHostname to true to make the ingest and preview URL host name the same.
     # This can slow things down a bit.
     use_static_hostname=True,
@@ -154,7 +150,7 @@ live_event_create=LiveEvent(
         # Set this to Basic pass-through, Standard pass-through, Standard or Premium1080P to use the cloud live encoder.
         # See https://go.microsoft.com/fwlink/?linkid=2095101 for more information
         # Otherwise, leave as "None" to use pass-through mode
-        encoding_type=LiveEventEncodingType.PREMIUM1080_P,
+        encoding_type=LiveEventEncodingType.STANDARD,
         # OPTIONS for encoding type you can use:
         # encoding_type=LiveEventEncodingType.PassthroughBasic, # Basic pass-through mode - the cheapest option!
         # encoding_type=LiveEventEncodingType.PassthroughStandard, # also known as standard pass-through mode (formerly "none")
@@ -163,7 +159,14 @@ live_event_create=LiveEvent(
 
         # OPTIONS using live cloud encoding type:
         # key_frame_interval=timedelta(seconds = 2), # If this value is not set for an encoding live event, the fragment duration defaults to 2 seconds. The value cannot be set for pass-through live events.
-        # preset_name=None, # only used for custom defined presets.
+
+        # For Low Latency HLS Live streaming, there are two new custom presets available:
+        # "720p-3-Layer": For use with a Standard 720P encoding_type live event
+        # {"ElementaryStreams":[{"Type":"Video","BitRate":2500000,"Width":1280,"Height":720},{"Type":"Video","BitRate":1000000,"Width":960,"Height":540},{"Type":"Video","BitRate":400000,"Width":640,"Height":360}]}"
+        # "1080p-4-Layer":  For use with a Premium1080p encoding_type live event
+        # {"ElementaryStreams":[{"Type":"Video","BitRate":4500000,"Width":1920,"Height":1080},{"Type":"Video","BitRate":2200000,"Width":1280,"Height":720},{"Type":"Video","BitRate":1000000,"Width":960,"Height":540},{"Type":"Video","BitRate":400000,"Width":640,"Height":360}]}
+
+        preset_name= "720p-3-Layer", # only used for custom defined presets.
         # stretch_mode= None # can be used to determine stretch on encoder mode
     ),
 
@@ -171,7 +174,8 @@ live_event_create=LiveEvent(
     preview=live_event_preview,
 
     # 4) Set up more advanced options on the live event. Low Latency is the most common one.
-    stream_options=[StreamOptionsFlag.LOW_LATENCY]
+    # To enable Apple's Low Latency HLS (LL-HLS) streaming, you must use "LOW_LATENCY_V2" stream option
+    stream_options=[StreamOptionsFlag.LOW_LATENCY_V2]
 
     #5) Optionally, enable live transcriptions if desired.
     # WARNING : This is extra cost ($$$), so please check pricing before enabling. Transcriptions are not supported on PassthroughBasic.
@@ -232,9 +236,8 @@ async def main():
         output_asset = await client.assets.create_or_update(resource_group, account_name, asset_name, out_asset)
 
         if output_asset:
-            output_asset_name = output_asset.name
             # print output asset name
-            print(f"The output asset name is: {output_asset_name}")
+            print(f"The output asset name is: {output_asset.name}")
             print()
         else:
             raise ValueError('Output Asset creation failed!')
@@ -255,13 +258,15 @@ async def main():
             time_start = time.perf_counter()
             live_output_create = LiveOutput(
                 description="Optional description when using more than one live output",
-                asset_name=output_asset_name,
+                asset_name=output_asset.name,
                 manifest_name=manifest_name,      # The HLS and DASH manifest file name. This is recommended to set if you want a deterministic manifest path up front.
-                archive_window_length=timedelta(hours=1),     # Sets an one hour time-shift DVR window. Uses ISO 8601 format string.
+                archive_window_length=timedelta(minutes=20),     # Sets a 20 minute asset archive window.
+                rewind_window_length=timedelta(minutes=20), # Sets a 20 minute time-shift (DVR) window length.
                 hls=Hls(
                     fragments_per_ts_segment=1        # Advanced setting when using HLS TS output only.
                 )
             )
+
             print(f"live_output_create object is {live_output_create}")
             print()
 
@@ -292,7 +297,8 @@ async def main():
             print()
 
         if live_event.preview.endpoints:
-            # Use the preview_endpoint to preview and verify that the input from the encoder is actually being received
+            # Use the preview_endpoint to preview and verify
+            # that the input from the encoder is actually being received
             # The preview endpoint URL also support the addition of various format strings for HLS (format=m3u8-cmaf) and DASH (format=mpd-time-cmaf) for example.
             # The default manifest is Smooth.
             preview_endpoint = live_event.preview.endpoints[0].url

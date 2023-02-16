@@ -1,5 +1,5 @@
-# This sample demonstrates how to get the container name from any Asset. It can be in input or output asset from an encoding job.
-# Not that this sample also demonstrates how to name the container on creation.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
@@ -14,7 +14,7 @@ load_dotenv()
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
-# Get the environment variables SUBSCRIPTIONID, RESOURCEGROUP, ACCOUNTNAME
+# Get the environment variables
 subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
 resource_group = os.getenv('AZURE_RESOURCE_GROUP')
 account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
@@ -29,8 +29,8 @@ client = AzureMediaServices(default_credential, subscription_id)
 # List the Assets in Account
 print("Listing assets in account:")
 
-asset_name = 'MyCustomAssetName'
-storage_container_name = 'mycustomcontainername'    # Lower case, numbers and dashes are ok. Check MSDN for more information about valid container naming
+asset_name = f"getcontainerfromasset{uniqueness}"
+storage_container_name = f"getcontainerfromasset{uniqueness}"    # Lower case, numbers and dashes are ok. Check MSDN for more information about valid container naming
 
 print(f"Creating a new Asset with the name: {asset_name} in storage container {storage_container_name}")
 # The asset_id will be used for the container parameter for the storage SDK after the asset is created by the AMS client.
@@ -43,13 +43,14 @@ asset = client.assets.create_or_update(
   parameters=new_asset
 )
 
-if asset:
+try:
+  asset
   print("Asset created")
   print(f"This asset is in storage account '{asset.storage_account_name}' in the container '{asset.container}'")
-else:
-  raise Exception("There was an error while creating an asset.")
+except Exception as e:
+  print(e)
 
-# Deleting an asset
+# Delete the asset.
 print("Deleting asset")
 client.assets.delete(resource_group, account_name, asset_name)
 print("Asset is now deleted")

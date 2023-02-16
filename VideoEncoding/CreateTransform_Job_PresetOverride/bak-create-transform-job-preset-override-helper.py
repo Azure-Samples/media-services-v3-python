@@ -1,6 +1,12 @@
 
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
+# This sample demonstrates how to create an very simple Transform to use for submitting any custom Job into.
+# Creating a very basic transform in this fashion allows you to treat the AMS v3 API more like the legacy v2 API where
+# transforms were not required, and you could submit any number of custom jobs to the same endpoint.
+# In the new v3 API, the default workflow is to create a transform "template" that holds a unique queue of jobs just for that
+# specific "recipe" of custom or pre-defined encoding.
+
+# This sample shows how to create the blank empty Transform, and then submit a couple unique custom jobs to it,
+# overriding the blank empty Transform.
 
 import asyncio
 from datetime import timedelta
@@ -15,7 +21,10 @@ from azure.mgmt.media.models import (
   AacAudio,
   H264Video,
   H264Complexity,
+  PngImage,
   Mp4Format,
+  PngLayer,
+  PngFormat,
   AacAudioProfile,
   OnErrorType,
   Priority,
@@ -26,7 +35,7 @@ import os, random
 
 # Import Job Helpers
 from importlib.machinery import SourceFileLoader
-mymodule = SourceFileLoader("encoding_job_helpers", "Common/encoding_job_helpers.py").load_module()
+mymodule = SourceFileLoader('encoding_job_helpers', '../../Common/Encoding/encoding_job_helpers.py').load_module()
 
 # Get environment variables
 load_dotenv()
@@ -54,11 +63,11 @@ mymodule.create_azure_media_services(client)
 # The file you want to upload.  For this example, the file is placed under Media folder.
 # The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
-name_prefix = "presetoverride"
-output_folder = "Output/"
+name_prefix = "encodeH264"
+output_folder = "../../Output/"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
-uniqueness = str(random.randint(0,9999))
+uniqueness = "mySampleRandomID" + str(random.randint(0,9999))
 
 transform_name = 'EmptyTransform'
 
@@ -219,12 +228,10 @@ async def main():
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
 
-    # Uncomment the below to download the resulting files.
-    """
+    # Check on the status of the second HEVC encoding job and then download the output
     if job2.state == 'Finished':
       await mymodule.download_results(out_asset_name_HEVC, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-      """
 
   # closing media client
   print('Closing media client')

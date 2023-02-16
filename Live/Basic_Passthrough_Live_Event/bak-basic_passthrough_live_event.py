@@ -1,6 +1,3 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 # Azure Media Services Live Streaming Sample for Python
 # This sample demonstrates how to enable Low Latency HLS (LL-HLS) streaming with encoding
 
@@ -54,6 +51,8 @@ from azure.mgmt.media.models import (
     LiveEventEncodingType,
     LiveEventInputProtocol,
     StreamOptionsFlag,
+    LiveEventTranscription,
+    LiveEventOutputTranscriptionTrack,
     Hls,
     StreamingLocator
 )
@@ -74,11 +73,10 @@ account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
-prefix = "720p-ll-live-event"
-live_event_name = f'{prefix}-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
-asset_name = f'{prefix}-archive-asset-{uniqueness}'
-live_output_name = f'{prefix}-live-output-{uniqueness}'
-streaming_locator_name = f'{prefix}-live-stream-locator-{uniqueness}'
+live_event_name = f'liveEvent-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
+asset_name = f'archiveAsset-{uniqueness}'
+live_output_name = f'liveOutput-{uniqueness}'
+streaming_locator_name = f'liveStreamLocator-{uniqueness}'
 streaming_endpoint_name = 'default'     # Change this to your specific streaming endpoint name if not using "default"
 manifest_name = "output"
 
@@ -118,9 +116,11 @@ allow_all_input_range=IPRange(name="AllowAll", address="0.0.0.0", subnet_prefix_
 # re-use the same range here for the sample, but in production, you can lock this down to the IP range for your on-premises
 # live encoder, laptop, or device that is sending the live stream
 live_event_input_access=LiveEventInputAccessControl(ip=IPAccessControl(allow=[allow_all_input_range]))
+
+
 # Create the LiveEvent Preview IP access control object.
 # This will restrict which clients can view the preview endpoint
-# re-use the same range here for the sample, but in production, you can lock this to the IPs of your
+# re-se the same range here for the sample, but in production, you can lock this to the IPs of your
 # devices that would be monitoring the live preview.
 live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl(ip=IPAccessControl(allow=[allow_all_input_range])))
 
@@ -133,10 +133,8 @@ live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl
 # https://docs.microsoft.com/rest/api/media/liveevents/create
 
 live_event_create=LiveEvent(
-    # NOTE: Make sure that your live stream is located in the same region as your Media Services account.
-    # Otherwise, a Resource Not Found error for your AMS account will be thrown.
-    location="West US",       # For the sample, we are using location: West US 2
-    description="Sample 720P Low Latency Encoding Live Event from Python SDK sample",
+    location="West US 2",       # For the sample, we are using location: West US 2
+    description="Sample 720P Encoding Live Event from Python SDK sample",
     # Set useStaticHostname to true to make the ingest and preview URL host name the same.
     # This can slow things down a bit.
     use_static_hostname=True,
@@ -146,7 +144,7 @@ live_event_create=LiveEvent(
         streaming_protocol=LiveEventInputProtocol.RTMP,     # Options are RTMP or Smooth Streaming ingest format.
         access_control=live_event_input_access,     # controls the IP restriction for the source header
         # key_frame_interval_duration = timedelta(seconds = 2),       # Set this to match the ingest encoder's settings. This should not be used for encoding channels
-        access_token='9eb1f703b149417c8448771867f48501'       # Use this value when you want to make sure the ingest URL is static and always the same. If omitted, the service will generate a random GUID values.
+        access_token='9eb1f703b149417c8448771867f48501'       # Use this value when you want to make sure the ingest URL is static and always the same. If omited, the service will generate a random GUID values.
     ),
 
     # 2) Set the live event to use pass-through or cloud encoding modes...
@@ -154,7 +152,7 @@ live_event_create=LiveEvent(
         # Set this to Basic pass-through, Standard pass-through, Standard or Premium1080P to use the cloud live encoder.
         # See https://go.microsoft.com/fwlink/?linkid=2095101 for more information
         # Otherwise, leave as "None" to use pass-through mode
-        encoding_type=LiveEventEncodingType.STANDARD,
+        encoding_type=LiveEventEncodingType.PASSTHROUGH_BASIC,
         # OPTIONS for encoding type you can use:
         # encoding_type=LiveEventEncodingType.PassthroughBasic, # Basic pass-through mode - the cheapest option!
         # encoding_type=LiveEventEncodingType.PassthroughStandard, # also known as standard pass-through mode (formerly "none")
@@ -170,7 +168,7 @@ live_event_create=LiveEvent(
         # "1080p-4-Layer":  For use with a Premium1080p encoding_type live event
         # {"ElementaryStreams":[{"Type":"Video","BitRate":4500000,"Width":1920,"Height":1080},{"Type":"Video","BitRate":2200000,"Width":1280,"Height":720},{"Type":"Video","BitRate":1000000,"Width":960,"Height":540},{"Type":"Video","BitRate":400000,"Width":640,"Height":360}]}
 
-        preset_name= "720p-3-Layer", # only used for custom defined presets.
+        # preset_name=None, # only used for custom defined presets.
         # stretch_mode= None # can be used to determine stretch on encoder mode
     ),
 
@@ -179,7 +177,7 @@ live_event_create=LiveEvent(
 
     # 4) Set up more advanced options on the live event. Low Latency is the most common one.
     # To enable Apple's Low Latency HLS (LL-HLS) streaming, you must use "LOW_LATENCY_V2" stream option
-    stream_options=[StreamOptionsFlag.LOW_LATENCY_V2]
+    stream_options=[StreamOptionsFlag.LOW_LATENCY]
 
     #5) Optionally, enable live transcriptions if desired.
     # WARNING : This is extra cost ($$$), so please check pricing before enabling. Transcriptions are not supported on PassthroughBasic.
@@ -212,8 +210,8 @@ print()
 
 async def main():
     async with client:
-        client_live = await client.live_events.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, parameters=live_event_create, auto_start=False)
         time_start=time.perf_counter()
+        client_live = await client.live_events.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, parameters=live_event_create, auto_start=False)
         time_end = time.perf_counter()
         execution_time = (time_end - time_start)
         if client_live:
@@ -264,8 +262,7 @@ async def main():
                 description="Optional description when using more than one live output",
                 asset_name=output_asset.name,
                 manifest_name=manifest_name,      # The HLS and DASH manifest file name. This is recommended to set if you want a deterministic manifest path up front.
-                archive_window_length=timedelta(minutes=20),     # Sets a 20 minute asset archive window.
-                rewind_window_length=timedelta(minutes=20), # Sets a 20 minute time-shift (DVR) window length.
+                archive_window_length=timedelta(hours=1),     # Sets an one hour time-shift DVR window. Uses ISO 8601 format string.
                 hls=Hls(
                     fragments_per_ts_segment=1        # Advanced setting when using HLS TS output only.
                 )
