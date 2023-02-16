@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 # There are three scenarios where Managed Identities can be used with Media Services:
 #
 # 1) Granting a Media Services account access to Key Vault to enable Customer Managed Keys
@@ -47,7 +50,9 @@ client = AzureMediaServices(default_credential, subscription_id)
 
 # The New Storage Account Name and the information for Managed Identity that will be used
 account_name = f'testaccount{uniqueness}'
-managed_identity_resource = f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managed_identity_name}"
+
+managed_identity_resource = "/subscriptions/b05324b8-2a72-4d0c-9fef-18dfebdccfcf/resourceGroups/pythontesting_rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/pythontestingumi"
+#managed_identity_resource = f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{managed_identity_name}"
 
 # Set this to one of the available region names using the format japanwest,japaneast,eastasia,southeastasia,
 # westeurope,northeurope,eastus,westus,australiaeast,australiasoutheast,eastus2,centralus,brazilsouth,
@@ -68,7 +73,8 @@ parameters = MediaService(
       # This should point to an already created storage account that is Blob storage General purpose v2.
       # Recommend to use ZRS or Geo redundant ZRS in regions that support availability zones
       type=StorageAccountType.PRIMARY,
-      id=f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Storage/storageAccounts/{storage_account_name}",
+      # /subscriptions/b05324b8-2a72-4d0c-9fef-18dfebdccfcf/resourceGroups/pythontesting_rg/providers/microsoft.storage/storageaccounts/pythongtestingstor
+      id="/subscriptions/b05324b8-2a72-4d0c-9fef-18dfebdccfcf/resourceGroups/pythontesting_rg/providers/microsoft.storage/storageaccounts/pythongtestingstor",
       # Set the user assigned managed identity resource and set system assigned to false here.
       identity=ResourceIdentity(
         user_assigned_identity=managed_identity_resource,
@@ -93,7 +99,7 @@ parameters = MediaService(
   identity=MediaServiceIdentity(
     type="UserAssigned",
     user_assigned_identities={
-      "managed_identity_resource": {}
+      managed_identity_resource: {}
     }
   ),
   # If you plan to use a private network and do not want any streaming to
@@ -119,14 +125,15 @@ availability = client.locations.check_name_availability(
   )
 )
 
-if not availability.name_available:
+try:
+  availability.name_available
+except Exception as e:
   print(f"The account with the name {account_name} is not available.")
   print(availability.message)
-  raise Exception(availability.message)
 
 # Create a new Media Services account
-response = client.mediaservices.create_or_update(resource_group, account_name, parameters)
-if response:
-  print(f"Successfully created account '{response.name}'.")
-else:
-  raise Exception("Failed to create the Media Services Account")
+try:
+  response = client.mediaservices.begin_create_or_update(resource_group, account_name, parameters)
+  print("Account created.")
+except Exception as e:
+  print(e)
