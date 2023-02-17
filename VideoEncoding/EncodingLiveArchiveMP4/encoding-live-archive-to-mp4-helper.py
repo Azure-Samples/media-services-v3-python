@@ -117,7 +117,7 @@ async def main():
       print()
     except:
       print("There was an error creating the transform.")
-
+    #<TopBitRate>
     # Use this to select the top bitrate from the live archive asset
     # The filter property allows you to select the "Top" bitrate which would be the
     # highest bitrate provided by the live encoder.
@@ -125,7 +125,8 @@ async def main():
       attribute=TrackAttribute.BITRATE,
       filter=AttributeFilter.TOP    # Use this to select the top bitrate in this ABR asset for the job
     )
-
+#</TopBitRate>
+#<SubclipJobInput>
     # Create Job Input and Job Output Asset
     input = JobInputAsset(
       asset_name=input_archive_name,
@@ -137,7 +138,7 @@ async def main():
         )
       ]
     )
-
+#</SubclipJobInput>
     output_asset_name = f"{name_prefix}-output-{uniqueness}"
     job_name = f"{name_prefix}-job-{uniqueness}"
 
