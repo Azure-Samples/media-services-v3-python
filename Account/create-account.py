@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.media import AzureMediaServices
@@ -109,14 +112,15 @@ availability = client.locations.check_name_availability(
   )
 )
 
-if not availability.name_available:
+try:
+  availability.name_available
+except Exception as e:
   print(f"The account with the name {account_name} is not available.")
   print(availability.message)
-  raise Exception(availability.message)
 
 # Create a new Media Services account
-response = client.mediaservices.create_or_update(resource_group, account_name, parameters)
-if response:
-  print(f"Successfully created account '{response.name}'.")
-else:
-  raise Exception("Failed to create the Media Services Account")
+try:
+  response = client.mediaservices.begin_create_or_update(resource_group, account_name, parameters)
+  print("Account created.")
+except Exception as e:
+  print(e)

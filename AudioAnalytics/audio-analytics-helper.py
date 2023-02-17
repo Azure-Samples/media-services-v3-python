@@ -9,21 +9,24 @@ from azure.mgmt.media.aio import AzureMediaServices
 from azure.mgmt.media.models import (
   Transform,
   TransformOutput,
-  BuiltInStandardEncoderPreset,
-  PresetConfigurations,
-  EncoderNamedPreset,
-  InterleaveOutput,
+  AudioAnalyzerPreset,
+  AudioAnalysisMode,
   OnErrorType,
   Priority
   )
-import os, random
+import os
+import random
 
 # Import Job Helpers
 from importlib.machinery import SourceFileLoader
-mymodule = SourceFileLoader('encoding_job_helpers', 'Common/encoding_job_helpers.py').load_module()
+
+
+mymodule = SourceFileLoader("encoding_job_helpers", "Common/encoding_job_helpers.py").load_module()
+
 
 # Get environment variables
 load_dotenv()
+
 
 default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
@@ -46,62 +49,43 @@ mymodule.create_azure_media_services(client)
 # The file you want to upload.  For this example, the file is placed under Media folder.
 # The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
-name_prefix = "contentAwareHEVCConstrained"
+name_prefix = "audioanalytics"
 output_folder = "Output/"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = str(random.randint(0,9999))
 
-transform_name = 'HEVCEncodingContentAwareConstrained'
+transform_name = 'AudioAnalyzerTransformBasic'
 
 async def main():
   async with client:
     # Create a new Standard encoding Transform for H264
     print(f"Creating Standard Encoding transform named: {transform_name}")
 
-    # This sample uses constraints on the CAE encoding preset to reduce the number of tracks output and resolutions to a specific range.
-    # First we will create a PresetConfigurations object to define the constraints that we want to use
-    # This allows you to configure the encoder settings to control the balance between speed and quality. Example: set Complexity as Speed for faster encoding but less compression efficiency.
-
-    preset_config = PresetConfigurations(
-        complexity="Speed",
-        # The output includes both audio and video.
-        interleave_output=InterleaveOutput.INTERLEAVED_OUTPUT,
-        # The key frame interval in seconds. Example: set as 2 to reduce the playback buffering for some players.
-        key_frame_interval_in_seconds= 2,
-        # The maximum bitrate in bits per second (threshold for the top video layer). Example: set max_bitrate_bps as 6000000 to avoid producing very high bitrate outputs for contents with high complexity
-        max_bitrate_bps= 3000000,
-        # The minimum bitrate in bits per second (threshold for the bottom video layer). Example: set min_bitrate_bps as 200000 to have a bottom layer that covers users with low network bandwidth.
-        min_bitrate_bps= 200000,
-        #The maximum height of output video layers. Example: set max_height as 720 to produce output layers up to 720P even if the input is 4K.
-        max_height= 720,
-        # The minimum height of output video layers. Example: set min_height as 360 to avoid output layers of smaller resolutions like 180P.
-        min_height=270,
-        #  The maximum number of output video layers. Example: set max_layers as 4 to make sure at most 4 output layers are produced to control the overall cost of the encoding job.
-        max_layers=3
-    )
-
-    # From SDK
-    # TransformOutput(*, preset, on_error=None, relative_priority=None, **kwargs) -> None
-    # For this snippet, we are using 'BuiltInStandardEncoderPreset'
-    # Create a new Content Aware Encoding Preset using the Preset Configuration
+    # For this snippet, we are using 'AudioAnalyzerPreset'
     transform_output = TransformOutput(
-      preset = BuiltInStandardEncoderPreset(
-        preset_name = EncoderNamedPreset.H265_CONTENT_AWARE_ENCODING,
-        # Configurations can be used to control values used by the Content Aware Encoding Preset.
-        configurations = preset_config
-      ),
-      # What should we do with the job if there is an error?
-      on_error=OnErrorType.STOP_PROCESSING_JOB,
-      # What is the relative priority of this job to others? Normal, high or low?
-      relative_priority=Priority.NORMAL
+    preset=AudioAnalyzerPreset(
+        audio_language="en-GB",   # Be sure to modify this to your desired language code in BCP-47 format.
+        # Set the language to British English - see see https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support#speech-to-text
+
+        # There are two modes available, Basic and Standard
+        # Basic : This mode performs speech-to-text transcription and generation of a VTT subtitle/caption file.
+        #         The output of this mode includes an Insights JSON file including only the keywords, transcription, and timing information.
+        #         Automatic language detection and speaker diarization are not included in this mode.
+        # Standard : Performs all operations included in the Basic mode, additionally performing language detection and speaker diarization.
+        mode=AudioAnalysisMode.BASIC    # Change this to Standard if you would like to use the more advanced audio analyzer
+    ),
+    # What should we do with the job if there is an error?
+    on_error=OnErrorType.STOP_PROCESSING_JOB,
+    # What is the relative priority of this job to others? Normal, high or low?
+    relative_priority=Priority.NORMAL
     )
 
     print("Creating encoding transform...")
 
     # Adding transform details
     my_transform = Transform()
-    my_transform.description="HEVC content aware encoding with configuration settings"
+    my_transform.description="A simple custom H264 encoding transform with 3 MP4 bitrates"
     my_transform.outputs = [transform_output]
 
     print(f"Creating transform {transform_name}")
@@ -134,12 +118,10 @@ async def main():
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
 
-    # Uncomment the following lines to download the resulting files.
-    """
     if job.state == 'Finished':
+      # Download the resulting files: insights.json, metadata.json, transcript.ttml and transript.vtt
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
-    """
 
   # closing media client
   print('Closing media client')

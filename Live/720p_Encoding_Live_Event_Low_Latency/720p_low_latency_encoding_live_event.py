@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 # Azure Media Services Live Streaming Sample for Python
 # This sample demonstrates how to enable Low Latency HLS (LL-HLS) streaming with encoding
 
@@ -35,8 +38,8 @@ import asyncio
 from datetime import timedelta
 import time
 from dotenv import load_dotenv
-from azure.identity import DefaultAzureCredential
-from azure.mgmt.media import AzureMediaServices
+from azure.identity.aio import DefaultAzureCredential
+from azure.mgmt.media.aio import AzureMediaServices
 from azure.mgmt.media.models import (
     Asset,
     IPRange,
@@ -51,8 +54,6 @@ from azure.mgmt.media.models import (
     LiveEventEncodingType,
     LiveEventInputProtocol,
     StreamOptionsFlag,
-    LiveEventTranscription,
-    LiveEventOutputTranscriptionTrack,
     Hls,
     StreamingLocator
 )
@@ -73,10 +74,11 @@ account_name = os.getenv('AZURE_MEDIA_SERVICES_ACCOUNT_NAME')
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = random.randint(0,9999)
-live_event_name = f'liveEvent-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
-asset_name = f'archiveAsset-{uniqueness}'
-live_output_name = f'liveOutput-{uniqueness}'
-streaming_locator_name = f'liveStreamLocator-{uniqueness}'
+prefix = "720p-ll-live-event"
+live_event_name = f'{prefix}-{uniqueness}'     # WARNING: Be careful not to leak live events using this sample!
+asset_name = f'{prefix}-archive-asset-{uniqueness}'
+live_output_name = f'{prefix}-live-output-{uniqueness}'
+streaming_locator_name = f'{prefix}-live-stream-locator-{uniqueness}'
 streaming_endpoint_name = 'default'     # Change this to your specific streaming endpoint name if not using "default"
 manifest_name = "output"
 
@@ -131,7 +133,9 @@ live_event_preview=LiveEventPreview(access_control=LiveEventPreviewAccessControl
 # https://docs.microsoft.com/rest/api/media/liveevents/create
 
 live_event_create=LiveEvent(
-    location="West US 2",       # For the sample, we are using location: West US 2
+    # NOTE: Make sure that your live stream is located in the same region as your Media Services account.
+    # Otherwise, a Resource Not Found error for your AMS account will be thrown.
+    location="West US",       # For the sample, we are using location: West US 2
     description="Sample 720P Low Latency Encoding Live Event from Python SDK sample",
     # Set useStaticHostname to true to make the ingest and preview URL host name the same.
     # This can slow things down a bit.
@@ -142,7 +146,7 @@ live_event_create=LiveEvent(
         streaming_protocol=LiveEventInputProtocol.RTMP,     # Options are RTMP or Smooth Streaming ingest format.
         access_control=live_event_input_access,     # controls the IP restriction for the source header
         # key_frame_interval_duration = timedelta(seconds = 2),       # Set this to match the ingest encoder's settings. This should not be used for encoding channels
-        access_token='9eb1f703b149417c8448771867f48501'       # Use this value when you want to make sure the ingest URL is static and always the same. If omited, the service will generate a random GUID values.
+        access_token='9eb1f703b149417c8448771867f48501'       # Use this value when you want to make sure the ingest URL is static and always the same. If omitted, the service will generate a random GUID values.
     ),
 
     # 2) Set the live event to use pass-through or cloud encoding modes...
@@ -208,8 +212,8 @@ print()
 
 async def main():
     async with client:
-        time_start=time.perf_counter()
         client_live = await client.live_events.begin_create(resource_group_name=resource_group, account_name=account_name, live_event_name=live_event_name, parameters=live_event_create, auto_start=False)
+        time_start=time.perf_counter()
         time_end = time.perf_counter()
         execution_time = (time_end - time_start)
         if client_live:

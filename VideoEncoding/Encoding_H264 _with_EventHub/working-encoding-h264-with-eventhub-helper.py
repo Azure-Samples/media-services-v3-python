@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 # This sample uses the following settings from the .env setting file to connect to a pre-configured Event Hub and Event Grid subscription
 # To use this sample, you first need to go into your Media Services account and configure Event Grid to submit
 # events for all types into an Event Hub endpoint.
@@ -36,7 +39,7 @@ import os, random
 
 # Import Job Helpers
 from importlib.machinery import SourceFileLoader
-mymodule = SourceFileLoader('encoding_job_helpers', '../../Common/Encoding/encoding_job_helpers.py').load_module()
+mymodule = SourceFileLoader("encoding_job_helpers", "Common/encoding_job_helpers.py").load_module()
 
 # Get environment variables
 load_dotenv()
@@ -70,11 +73,11 @@ mymodule.create_azure_media_services(client)
 # The file you want to upload.  For this example, the file is placed under Media folder.
 # The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
-name_prefix = "encodeH264"
-output_folder = "../../Output/"
+name_prefix = "encodeH264eventgrid"
+output_folder = "Output/"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
-uniqueness = "mySampleRandomID" + str(random.randint(0,9999))
+uniqueness = str(random.randint(0,9999))
 
 transform_name = 'H264Encoding'
 
@@ -195,9 +198,12 @@ async def main():
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
 
+    # Uncomment the below to download the results.
+    """
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
+    """
 
   # closing media client
   print('Closing media client')

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 import asyncio
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -24,7 +27,7 @@ import os, random
 
 # Import Job Helpers
 from importlib.machinery import SourceFileLoader
-mymodule = SourceFileLoader('encoding_job_helpers', '../../Common/Encoding/encoding_job_helpers.py').load_module()
+mymodule = SourceFileLoader('encoding_job_helpers', 'Common/encoding_job_helpers.py').load_module()
 
 # Get environment variables
 load_dotenv()
@@ -53,10 +56,10 @@ mymodule.create_azure_media_services(client)
 # The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
 name_prefix = "encodeOverlayPng"
-output_folder = "../../Output/"
+output_folder = "Output/"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
-uniqueness = "mySampleRandomID" + str(random.randint(0,9999))
+uniqueness = str(random.randint(0,9999))
 
 # Use the following PNG image to overlay on top of the video
 overlay_file = "AzureMediaService.png"
@@ -154,9 +157,12 @@ async def main():
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
 
+    # Uncomment the following lines to download the resulting files.
+    """
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
+    """
 
   # closing media client
   print('Closing media client')

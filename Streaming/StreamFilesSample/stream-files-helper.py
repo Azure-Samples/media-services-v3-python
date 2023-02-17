@@ -20,7 +20,8 @@ from azure.mgmt.media.models import (
   PngFormat,
   AacAudioProfile,
   OnErrorType,
-  Priority
+  Priority,
+  StreamingLocator
   )
 import os
 import random
@@ -59,11 +60,15 @@ mymodule.create_azure_media_services(client)
 source_file = "ignite.mp4"
 name_prefix = "encodeH264"
 output_folder = "Output/"
+manifest_name = "output"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
 uniqueness = str(random.randint(0,9999))
 
 transform_name = 'H264Encoding'
+streaming_locator_name = f'{name_prefix}-live-stream-locator-{uniqueness}'
+# This uses the default streaming endpoint. Change it to the streaming endpoint that you want to work with, if necessary.
+streaming_endpoint_name = "default"
 
 async def main():
   async with client:
@@ -186,6 +191,47 @@ async def main():
       #await mymodule.download_results(output_asset_name, output_folder)
       #print("Downloaded results to local folder. Please review the outputs from the encoding job.")
     """
+    ############## STREAMING #####################
+    # Create a streaming locator
+    print("Creating streaming locator.")
+    streaming_locator = StreamingLocator(asset_name=output_asset_name,streaming_policy_name="Predefined_ClearStreamingOnly")
+    locator = await client.streaming_locators.create(resource_group_name=resource_group,account_name=account_name,streaming_locator_name=streaming_locator_name,parameters=streaming_locator)
+
+    # Get the default streaming endpoint on the account
+    streaming_endpoint = await client.streaming_endpoints.get(resource_group_name=resource_group,account_name=account_name,streaming_endpoint_name=streaming_endpoint_name)
+    if streaming_endpoint.resource_state != "Running":
+      print(f"Streaming endpoint is stopped. Starting the endpoint named {streaming_endpoint_name}...")
+      poller = await client.streaming_endpoints.begin_start(resource_group, account_name, streaming_endpoint_name)
+      client_streaming_begin = await poller.result()
+      print("Streaming Endpoint started.")
+      if not client_streaming_begin:
+        print("Streaming Endpoint was already started.")
+
+    # Get the URL to stream the Output
+    print("The streaming URLs to stream the live output from a client player")
+    print()
+
+    host_name = streaming_endpoint.host_name
+    scheme = 'https'
+
+    # Building the paths statically. Which is highly recommended when you want to share the stream manifests
+    # to a player application or CMS system ahead of the live event.
+    hls_format = "format=m3u8-cmaf"
+    dash_format = "format=mpd-time-cmaf"
+
+    manifest_base = f"{scheme}://{host_name}/{locator.streaming_locator_id}/{manifest_name}.ism/manifest"
+
+    hls_manifest = f'{manifest_base}({hls_format})'
+    print(f"The HLS (MP4) manifest URL is: {hls_manifest}")
+    print("Open the following URL to playback the live stream in an HLS compliant player (HLS.js, Shaka, ExoPlayer) or directly in an iOS device")
+    print({hls_manifest})
+    print()
+
+    dash_manifest = f'{manifest_base}({dash_format})'
+    print(f"The DASH manifest URL is: {dash_manifest}")
+    print("Open the following URL to playback the live stream from the LiveOutput in the Azure Media Player")
+    print(f"https://ampdemo.azureedge.net/?url={dash_manifest}&heuristicprofile=lowlatency")
+    print()
 
   # closing media client
   print('Closing media client')

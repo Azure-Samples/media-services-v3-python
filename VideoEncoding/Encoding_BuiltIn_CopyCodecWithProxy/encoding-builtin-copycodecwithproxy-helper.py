@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 # This sample shows how to use the built-in Copy codec preset that can take a source video file that is already encoded
 # using H264 and AAC audio, and copy it into MP4 tracks that are ready to be streamed by the AMS service.
 # In addition, this preset generates a fast proxy MP4 from the source video.
@@ -17,6 +20,8 @@
 #       which can cause some issues with adaptive switching.
 #       This preset works up to 4K and 60fps content.
 
+# NOTE: Make sure your streaming endpoint is running, or the videos won't play.
+
 
 import asyncio
 from datetime import timedelta
@@ -34,7 +39,8 @@ import os, random
 
 # Import Job Helpers
 from importlib.machinery import SourceFileLoader
-mymodule = SourceFileLoader('encoding_job_helpers', '../../Common/Encoding/encoding_job_helpers.py').load_module()
+
+mymodule = SourceFileLoader("encoding_job_helpers", "Common/encoding_job_helpers.py").load_module()
 
 # Get environment variables
 load_dotenv()
@@ -63,10 +69,10 @@ mymodule.create_azure_media_services(client)
 # The file ignite.mp4 has been provided for you.
 source_file = "ignite.mp4"
 name_prefix = "encode_builtin_copycodec_withproxy"
-output_folder = "../../Output/"
+output_folder = "Output/"
 
 # This is a random string that will be added to the naming of things so that you don't have to keep doing this during testing
-uniqueness = "mySampleRandomID" + str(random.randint(0,9999))
+uniqueness = str(random.randint(0,9999))
 
 transform_name = 'CopyCodecWithProxy'
 
@@ -126,9 +132,12 @@ async def main():
     print(f"Waiting for encoding job - {job.name} - to finish")
     job = await mymodule.wait_for_job_to_finish(transform_name, job_name)
 
+    # Uncomment the below to download the resulting files
+    """
     if job.state == 'Finished':
       await mymodule.download_results(output_asset_name, output_folder)
       print("Downloaded results to local folder. Please review the outputs from the encoding job.")
+    """
 
     # Publish the output asset for streaming via HLS or DASH
     if output_asset is not None:
