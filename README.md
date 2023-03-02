@@ -1,3 +1,16 @@
+---
+page_type: sample
+languages:
+- python
+products:
+- azure
+- azure-media-services
+name: Azure Media Services v3 Python Samples
+description: "This repository contains samples showing how to use Azure Media Services v3 API using Python"
+urlFragment: media-services-v3-python
+lastModified: 3/1/2023
+---
+
 # Azure Media Services v3 Python Samples
 
 The samples in this repo are part of [Azure Media Services](https://media.microsoft.com).  
