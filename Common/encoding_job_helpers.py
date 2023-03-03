@@ -74,8 +74,7 @@ def create_azure_media_services(ams_account):
 # Since the media folder would have a different relative path, his sets the location of the media files
 # so that it is relative to the helper function script. All that is passed to the helper function is the file name.
 
-media_folder = "C:\\Users\\inhenkel\\Documents\\AMSPython\\media-services-v3-python-03-02-2023\\Media\\"
-#media_folder = "../../Media/"
+media_folder = "C:\\absolute\\path\\to\\Media\\"
 
 async def submit_job(transform_name, job_name, job_input, output_asset_name, preset_override = None):
     if output_asset_name is None:
