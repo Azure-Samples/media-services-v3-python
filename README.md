@@ -13,7 +13,7 @@ lastModified: 3/1/2023
 
 # Azure Media Services v3 Python Samples
 
-The samples in this repo are part of [Azure Media Services](https://media.microsoft.com).  
+The samples in this repo are part of [Azure Media Services](https://media.microsoft.com).
 Use this set of samples to get started with the Azure Media Service v3 API and Python client SDK.
 
 **NOTE**
@@ -28,6 +28,7 @@ Owned and maintained by Microsoft. Please do not push changes directly to this r
 - Install Python 3.x
 
 #### Use Python virtual environments
+
 For every sample, we recommend that you always create and activate a virtual environment using the following steps:
 
 1. Open the sample folder in VSCode or other editor
@@ -61,7 +62,6 @@ pip install azure-identity
 Install the Python SDK for [Azure Media Services](https://docs.microsoft.com/python/api/overview/azure/media-services?view=azure-python)
 
 The Pypi page for the Media Services Python SDK with latest version details is located at - [azure-mgmt-media](https://pypi.org/project/azure-mgmt-media/)
-
 
 ``` bash
 pip install azure-mgmt-media
