@@ -13,6 +13,8 @@ lastModified: 3/1/2023
 
 # Azure Media Services v3 Python Samples
 
+**IMPORTANT NOTE : Azure Media Services have been retired on June 30, 2024. Please see the [retirement guide](https://learn.microsoft.com/azure/media-services/latest/azure-media-services-retirement).**
+
 The samples in this repo are part of [Azure Media Services](https://media.microsoft.com).
 Use this set of samples to get started with the Azure Media Service v3 API and Python client SDK.
 
